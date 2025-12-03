@@ -4,7 +4,8 @@
 #include <chrono>
 #include <algorithm>
 
-// #include "Card.h"
+#include "Card.h"
+#include "Suit.h"
 
 // JOKER IS 0-value card
 
