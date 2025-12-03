@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Deck.h"
+#include "deck.h"
 
 
 int main() {

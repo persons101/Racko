@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 
-#include "Card.h"
+#include "card.h"
 
 
 class Deck {

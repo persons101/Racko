@@ -13,7 +13,7 @@
                 "${fileDirname}\\..\\bin\\Racko.exe"
             ],
             "options": {
-                "cwd": "${fileDirname}\\.."
+                "cwd": "${fileDirname}\\..\\src"
             },
             "problemMatcher": [
                 "$gcc"

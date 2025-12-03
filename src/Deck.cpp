@@ -1,11 +1,10 @@
-#include "Deck.h"
+#include "deck.h"
 
 #include <random>
 #include <chrono>
 #include <algorithm>
 
-#include "Card.h"
-#include "Suit.h"
+#include "card.h"
 
 // JOKER IS 0-value card
 
@@ -53,6 +52,6 @@ void Deck::Shuffle() {
 
 void Deck::PrintDeck() const {
     for (const auto& card : deck) {
-        std::cout << "Card Value: " << card->getValue() << ", Suit: " << suit_name(card->getSuit()) << std::endl;
+        std::cout << "Card Value: " << card->getValue() << ", Suit: " << Card::suit_name(card->getSuit()) << std::endl;
     }
 }
