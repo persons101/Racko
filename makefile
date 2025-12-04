@@ -4,7 +4,6 @@ BIN_DIR = ./bin
 
 CXX=g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -O2
-INCLUDES = -I$(SRC_DIR)
 
 objects = card.o deck.o
 
@@ -20,9 +19,6 @@ obj:
 
 build: $(SRC_DIR)/*.cpp | bin obj
 		$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
-
-# $(objects:%=$(OBJ_DIR)/%): $(objects:%.o=$(SRC_DIR)/%.cpp)
-# 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 
 
