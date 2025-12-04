@@ -8,9 +8,9 @@ INCLUDES = -I$(SRC_DIR)
 
 objects = card.o deck.o
 
-.PHONY: all clean
+.PHONY: all build clean
 
-all: $(BIN_DIR)/Racko.exe clean
+all: build clean
 
 bin:
 	mkdir -p bin
@@ -18,10 +18,8 @@ bin:
 obj:
 	mkdir -p obj
 
-
-$(BIN_DIR)/Racko.exe: $(SRC_DIR)/*.cpp | bin obj
-# $(BIN_DIR)/Racko.exe: $(SRC_DIR)/main.cpp $(objects:%=$(OBJ_DIR)/%) | bin obj
-	$(CXX) $(CXXFLAGS) $^ -o $@ 
+build: $(SRC_DIR)/*.cpp | bin obj
+		$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
 
 # $(objects:%=$(OBJ_DIR)/%): $(objects:%.o=$(SRC_DIR)/%.cpp)
 # 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
