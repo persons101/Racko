@@ -1,2 +1,2 @@
-obj/
-bin/Racko.exe
+obj/*
+bin/*

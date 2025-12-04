@@ -4,7 +4,7 @@
 
 
 int main() {
-    Deck deck;
+    Deck deck(60,1);
 
     deck.PrintDeck();
 
