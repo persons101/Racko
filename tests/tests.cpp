@@ -1,5 +1,7 @@
 #include "../src/Card.cpp"
 #include "../src/Deck.cpp"
+#include "../src/Game.cpp"
+#include "../src/Player.cpp"
 
 #define CATCH_CONFIG_MAIN
 #include "catch_amalgamated.hpp"
@@ -19,3 +21,17 @@ TEST_CASE("Testing Suit to int", "[Suit]"){
     REQUIRE(static_cast<int>(Suit::CLUBS) == 4);
 }
 
+TEST_CASE("Game class creation", "[Game],[constructor]"){
+    Game game;
+}
+
+TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
+    SECTION("Player score management"){
+        REQUIRE(GetScore() == 0);
+        REQUIRE(AddScore(25) == 25);
+        REQUIRE(GetScore() == 25);
+    }
+    SECTION("Player card management"){
+        REQUIRE(GetCards().empty());
+    }
+}
