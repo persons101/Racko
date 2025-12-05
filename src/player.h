@@ -21,7 +21,7 @@ public:
     int GetScore() const;
     int AddScore(int);
 
-    std::vector<Card*> GetCards() const;
+    virtual std::vector<Card*> GetCards() const;
     bool DrawCard(Card*);
     Card* DiscardCard(Card*);
 };
