@@ -10,6 +10,7 @@ class Player {
 private:
     int score;
     std::string name;
+    std::vector<Card*> myCards;
 
 protected:
     Player();

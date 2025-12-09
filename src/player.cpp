@@ -16,5 +16,5 @@ int Player::AddScore(int points) {
 
 
 std::vector<Card*> Player::GetCards() const {
-    
+    return myCards;
 }
