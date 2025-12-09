@@ -24,7 +24,7 @@ public:
 
     virtual std::unordered_set<Card*> GetCards() const;
     bool DrawCard(Card*);
-    Card* DiscardCard(Card);
+    Card* DiscardCard(int, Suit);
     Card* DiscardRandomCard();
 };
 

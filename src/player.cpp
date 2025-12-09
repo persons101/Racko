@@ -26,7 +26,8 @@ bool Player::DrawCard(Card* drawCard){
     return true;
 }
 
-Card* Player::DiscardCard(Card cardToDiscard){
+Card* Player::DiscardCard(int discardVal, Suit discardSuit){
+    Card cardToDiscard(discardVal, discardSuit);
     std::unordered_set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
     if (itCardBeingDiscarded == myCards.end())
         return nullptr;
