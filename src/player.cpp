@@ -1,5 +1,7 @@
 #include "player.h"
 
+#include <random>
+
 Player::Player() { *this = Player("Test"); }
 
 Player::Player(std::string inName) : name(inName), score(0) {}
@@ -24,10 +26,18 @@ bool Player::DrawCard(Card* drawCard){
     return true;
 }
 
-Card* Player::DiscardCard(Card* cardToDiscard){
-    int count = myCards.count(cardToDiscard);
-    myCards.erase(cardToDiscard);
-    if (myCards.size() != (count - 1))
+Card* Player::DiscardCard(Card cardToDiscard){
+    std::unordered_set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
+    if (itCardBeingDiscarded == myCards.end())
         return nullptr;
-    return cardToDiscard;
+    myCards.erase(*itCardBeingDiscarded);
+    return *itCardBeingDiscarded;
+}
+
+Card* Player::DiscardRandomCard() {
+    std::unordered_set<Card*>::iterator it = myCards.begin();
+    for (int i = 0; i < (rand() % myCards.size()); i++){
+        it++;
+    }
+    return *it;
 }
