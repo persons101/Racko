@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 #include <string>
-#include <vector>
+#include <unordered_set>
 
 #include "card.h"
 
@@ -10,7 +10,7 @@ class Player {
 private:
     int score;
     std::string name;
-    std::vector<Card*> myCards;
+    std::unordered_set<Card*> myCards;
 
 protected:
     Player();
@@ -22,9 +22,10 @@ public:
     int GetScore() const;
     int AddScore(int);
 
-    virtual std::vector<Card*> GetCards() const;
+    virtual std::unordered_set<Card*> GetCards() const;
     bool DrawCard(Card*);
     Card* DiscardCard(Card*);
+    Card* DiscardRandomCard();
 };
 
 #endif

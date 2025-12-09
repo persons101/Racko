@@ -15,6 +15,19 @@ int Player::AddScore(int points) {
 }
 
 
-std::vector<Card*> Player::GetCards() const {
+std::unordered_set<Card*> Player::GetCards() const {
     return myCards;
+}
+
+bool Player::DrawCard(Card* drawCard){
+    myCards.insert(drawCard);
+    return true;
+}
+
+Card* Player::DiscardCard(Card* cardToDiscard){
+    int count = myCards.count(cardToDiscard);
+    myCards.erase(cardToDiscard);
+    if (myCards.size() != (count - 1))
+        return nullptr;
+    return cardToDiscard;
 }
