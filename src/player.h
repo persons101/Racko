@@ -23,9 +23,11 @@ public:
     int AddScore(int);
 
     virtual std::unordered_set<Card*> GetCards() const;
+    void PrintCards() const;
     bool DrawCard(Card*);
     Card* DiscardCard(int, Suit);
     Card* DiscardRandomCard();
+
 };
 
 #endif

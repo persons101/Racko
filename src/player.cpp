@@ -1,6 +1,7 @@
 #include "player.h"
 
 #include <random>
+#include <iostream>
 
 Player::Player() { *this = Player("Test"); }
 
@@ -21,6 +22,16 @@ std::unordered_set<Card*> Player::GetCards() const {
     return myCards;
 }
 
+void Player::PrintCards() const {
+    std::cout << name << "'s hand: ";
+
+    std::unordered_set<Card*>::const_iterator it = myCards.begin();
+    for (int i = 0; i < myCards.size(); i++){
+        std::cout << (*it)->getValue() << (*it)->getSuitSymbol() << " ";
+        it++;
+    }
+}
+
 bool Player::DrawCard(Card* drawCard){
     myCards.insert(drawCard);
     return true;
@@ -31,9 +42,8 @@ Card* Player::DiscardCard(int discardVal, Suit discardSuit){
     std::unordered_set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
     if (itCardBeingDiscarded == myCards.end())
         return nullptr;
-    Card* cardCopy(*itCardBeingDiscarded);
-    myCards.erase(*itCardBeingDiscarded);
-    return cardCopy;
+    auto nh = myCards.extract(*itCardBeingDiscarded);
+    return nh.value();
 }
 
 Card* Player::DiscardRandomCard() {
