@@ -27,7 +27,7 @@ void Player::PrintCards() const {
 
     std::unordered_set<Card*>::const_iterator it = myCards.begin();
     for (int i = 0; i < myCards.size(); i++){
-        std::cout << (*it)->getValue() << (*it)->getSuitSymbol() << " ";
+        (*it)->PrintCardShort(); 
         it++;
     }
 }

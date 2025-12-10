@@ -52,6 +52,6 @@ void Deck::Shuffle() {
 
 void Deck::PrintDeck() const {
     for (const auto& card : deck) {
-        std::cout << "Card Value: " << card->getValue() << ", Suit: " << Card::suit_name(card->getSuit()) << std::endl;
+        card->PrintCard();
     }
 }

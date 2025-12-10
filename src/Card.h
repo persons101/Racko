@@ -30,6 +30,7 @@ public:
     bool isBlack() { return (int)suit % 2 == 1; }
 
     virtual void PrintCard() const;
+    virtual void PrintCardShort() const;
 
     static const std::string suit_name(Suit suit);
 };
