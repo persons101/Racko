@@ -1,7 +1,7 @@
-#include "../src/Card.cpp"
-#include "../src/Deck.cpp"
-#include "../src/Game.cpp"
-#include "../src/Player.cpp"
+#include "../src/card.h"
+#include "../src/Deck.h"
+#include "../src/racko.h"
+#include "../src/player.h"
 
 #define CATCH_CONFIG_MAIN
 #include "catch_amalgamated.hpp"
@@ -22,7 +22,7 @@ TEST_CASE("Testing Suit to int", "[Suit]"){
 }
 
 TEST_CASE("Game class creation", "[Game],[constructor]"){
-    Game game;
+    Racko game;
 }
 
 TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){

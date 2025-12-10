@@ -24,17 +24,18 @@ public:
     Card(int, Suit);
     int getValue() const;
     virtual char getValueChar() const;
+    virtual std::string getValueString() const;
     Suit getSuit() const;
-    std::string getSuitName() const;
-    std::string getSuitSymbol() const;
-    bool isBlack() { return (int)suit % 2 == 1; }
+    virtual std::string getSuitName() const;
+    virtual std::string getSuitSymbol() const;
+    virtual bool isBlack() { return (int)suit % 2 == 1; }
 
     virtual void PrintCard() const;
     virtual void PrintCardShort() const;
 
     static const std::string suit_name(Suit);
-    struct compareCards { bool operator() (Card, Card) const; 
-                          bool operator() (Card*, Card*) const; };
+    struct compareCards { virtual bool operator() (Card, Card) const; 
+                          virtual bool operator() (Card*, Card*) const; };
 };
 
 #endif

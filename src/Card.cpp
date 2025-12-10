@@ -22,11 +22,23 @@ char Card::getValueChar() const {
         default:
             if (value > 13)
                 return '^';
-            if (value < 0)
+            else if (value < 0)
                 return '_';
-            return (std::to_string(value))[0];
+            return std::to_string(value)[0];
     }
+}
 
+std::string Card::getValueString() const {
+    switch (value) {
+        case 0: return "X";
+        case 1: return "A";
+        case 10: return "T";
+        case 11: return "J";
+        case 12: return "Q";
+        case 13: return "K";
+        default:
+            return std::to_string(value);
+    }
 }
 
 Suit Card::getSuit() const {
@@ -52,7 +64,7 @@ void Card::PrintCard() const {
 }
 
 void Card::PrintCardShort() const {
-    std::cout << getValueChar() << getSuitSymbol() << " ";
+    std::cout << getValueString() << getSuitSymbol() << " ";
 }
 
 const std::string Card::suit_name(Suit suit)  {

@@ -3,6 +3,7 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
+#include <iostream>
 
 #include "card.h"
 
@@ -51,7 +52,10 @@ void Deck::Shuffle() {
 }
 
 void Deck::PrintDeck() const {
+    std::cout << "---Start Deck---\n";
     for (const auto& card : deck) {
-        card->PrintCard();
+        card->PrintCardShort();
     }
+    std::cout << "\n";
+    std::cout << "--- End Deck ---\n";
 }

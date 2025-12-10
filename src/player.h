@@ -24,9 +24,9 @@ public:
     int AddScore(int);
 
     virtual std::set<Card*, Card::compareCards> GetCards() const;
-    void PrintCards() const;
+    virtual void PrintCards() const;
     bool DrawCard(Card*);
-    Card* DiscardCard(int, Suit);
+    virtual Card* DiscardCard(int, Suit);
     Card* DiscardRandomCard();
 
 };
