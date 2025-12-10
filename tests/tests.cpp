@@ -44,7 +44,7 @@ TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
 
         REQUIRE(GetCards().size() == 10);
 
-        Card* discardedCard = DiscardCard((5, Suit::HEARTS));
+        Card* discardedCard = DiscardCard(5, Suit::HEARTS);
 
         REQUIRE(discardedCard != nullptr);
         REQUIRE(GetCards().size() == 9);
@@ -53,5 +53,6 @@ TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
 
         REQUIRE(discardedCard != nullptr);
         REQUIRE(discardedCard->getSuit() == HEARTS);
+        REQUIRE(GetCards().size() == 8);
     }
 }

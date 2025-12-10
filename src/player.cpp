@@ -31,8 +31,9 @@ Card* Player::DiscardCard(int discardVal, Suit discardSuit){
     std::unordered_set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
     if (itCardBeingDiscarded == myCards.end())
         return nullptr;
+    Card* cardCopy(*itCardBeingDiscarded);
     myCards.erase(*itCardBeingDiscarded);
-    return *itCardBeingDiscarded;
+    return cardCopy;
 }
 
 Card* Player::DiscardRandomCard() {
