@@ -23,13 +23,25 @@ Deck::Deck(int numCardsPerSuit, int numSuits, int numJokers){
     this->numSuits = numSuits;
     numCards = numSuits * numCardsPerSuit + numJokers;
 
+    AddCardsToDeck(numCardsPerSuit, numSuits);
+    AddJokersToDeck(numJokers, numSuits);
+}
+
+Card* Deck::MakeNewCard(int cardValue, Suit cardSuit){
+    return new Card(cardValue, cardSuit);
+}
+
+void Deck::AddCardsToDeck(int numCardsPerSuit, int numSuits){
     for (int i = 1; i <= numSuits; i++){
         for (int j = 1; j <= numCardsPerSuit; j++){
-            deck.push_back(new Card(j, (Suit)i));
+            deck.push_back(MakeNewCard(j,(Suit)i));
         }
     }
+}
+
+void Deck::AddJokersToDeck(int numJokers, int numSuits){
     for (int i = 1; i <= numJokers; i++){
-        deck.push_back(new Card(0, (Suit)i));
+        deck.push_back(MakeNewCard(0, (Suit)i));
     }
 }
 
