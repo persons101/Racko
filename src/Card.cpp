@@ -64,3 +64,15 @@ const std::string Card::suit_name(Suit suit)  {
         default: return "Suit " + std::to_string(static_cast<int>(suit));
     }
 }
+
+bool Card::compareCards::operator() (Card a, Card b) const {
+    if (a.suit == b.suit)
+        return a.value < b.value;
+    return (int)a.suit < (int)b.suit;
+};
+
+bool Card::compareCards::operator() (Card* a, Card* b) const {
+    if (a->suit == b->suit)
+        return a->value < b->value;
+    return (int)a->suit < (int)b->suit;
+};
