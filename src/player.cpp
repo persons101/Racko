@@ -18,15 +18,17 @@ int Player::AddScore(int points) {
 }
 
 
-std::set<Card*, Card::compareCards> Player::GetCards() const {
+std::unordered_set<Card*> Player::GetCards() const {
     return myCards;
 }
 
 void Player::PrintCards() const {
     std::cout << name << "'s hand: ";
 
-    for (Card* card : myCards){
-        card->PrintCardShort();
+    std::unordered_set<Card*>::const_iterator it = myCards.begin();
+    for (int i = 0; i < myCards.size(); i++){
+        (*it)->PrintCardShort(); 
+        it++;
     }
     std::cout << "\n";
 }
@@ -39,7 +41,7 @@ bool Player::DrawCard(Card* drawCard){
 
 Card* Player::DiscardCard(int discardVal, Suit discardSuit){
     Card cardToDiscard(discardVal, discardSuit);
-    std::set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
+    std::unordered_set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
     if (itCardBeingDiscarded == myCards.end())
         return nullptr;
 
@@ -50,7 +52,7 @@ Card* Player::DiscardCard(int discardVal, Suit discardSuit){
 }
 
 Card* Player::DiscardRandomCard() {
-    std::set<Card*>::iterator it = myCards.begin();
+    std::unordered_set<Card*>::iterator it = myCards.begin();
     for (int i = 0; i < (rand() % myCards.size()); i++){
         it++;
     }

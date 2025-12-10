@@ -32,9 +32,7 @@ public:
     virtual void PrintCard() const;
     virtual void PrintCardShort() const;
 
-    static const std::string suit_name(Suit);
-    struct compareCards { bool operator() (Card, Card) const; 
-                          bool operator() (Card*, Card*) const; };
+    static const std::string suit_name(Suit suit);
 };
 
 #endif
