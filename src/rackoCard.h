@@ -1,6 +1,12 @@
+#ifndef RACKOCARD_H
+#define RACKOCARD_H
+
 #include "card.h"
 
-class RackoCard : Card {
+class RackoCard : public Card {
+public:
+    RackoCard(int cardVal);
     virtual std::string getSuitSymbol() const override;
-    virtual void PrintCardShort() const override;
 };
+
+#endif

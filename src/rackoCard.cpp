@@ -1,7 +1,7 @@
 #include "rackoCard.h"
 
-std::string RackoCard::getSuitSymbol() const { return ""; }
+#include <iostream>
 
-void RackoCard::PrintCardShort() const {
-    
-}
+RackoCard::RackoCard(int cardVal) : Card(cardVal, (Suit)0) { }
+
+std::string RackoCard::getSuitSymbol() const { return ""; }

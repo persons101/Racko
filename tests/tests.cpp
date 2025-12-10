@@ -2,6 +2,8 @@
 #include "../src/Deck.h"
 #include "../src/racko.h"
 #include "../src/player.h"
+#include "../src/rackoCard.h"
+#include "../src/rackoDeck.h"
 
 #define CATCH_CONFIG_MAIN
 #include "catch_amalgamated.hpp"
@@ -56,4 +58,41 @@ TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
         REQUIRE(discardedCard->getSuit() == HEARTS);
         REQUIRE(GetCards().size() == 8);
     }
+
+    SECTION("Full deck card management"){
+        Player player1("Steve");
+
+        for (int suit = 1; suit <= 4; suit++)
+            for (int cardVal = 1; cardVal <= 13; cardVal++)
+                player1.DrawCard(new Card(cardVal, (Suit)suit));
+
+        REQUIRE(player1.GetCards().size() == 13*4);
+
+        for (int suit = 1; suit <= 4; suit++)
+            for (int cardVal = 1; cardVal <= 13; cardVal++)
+                player1.DiscardRandomCard();
+
+        REQUIRE(player1.GetCards().size() == 0);
+    }
+}
+
+TEST_CASE("Player drawing from deck", "[Player][Player::DrawCard][Deck][Deck::GetTopCard]"){
+    Deck deck(60,1);
+    Player player1("Steve");
+
+    REQUIRE(deck.GetNumCards() == 60);
+
+    for (int suit = 1; suit <= 1; suit++)
+        for (int cardVal = 1; cardVal <= 60; cardVal++)
+            player1.DrawCard(deck.GetTopCard());
+
+    REQUIRE(deck.GetNumCards() == 0);
+    REQUIRE(player1.GetCards().size() == 60);
+}
+
+TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
+    RackoDeck deck;
+
+    REQUIRE(deck.GetNumCards() == 60);
+    REQUIRE(deck.GetTopCard());
 }
