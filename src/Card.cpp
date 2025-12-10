@@ -1,5 +1,7 @@
 #include "card.h"
 
+#include <iostream>
+
 Card::Card(int newValue, Suit newSuit){
     this->value = newValue;
     suit = newSuit;
@@ -19,10 +21,10 @@ char Card::getValueChar() const {
         case 13: return 'K';
         default:
             if (value > 13)
-                return '-';
+                return '^';
             if (value < 0)
                 return '_';
-            return value;
+            return (std::to_string(value))[0];
     }
 
 }

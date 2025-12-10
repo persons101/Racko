@@ -11,6 +11,7 @@ private:
     int score;
     std::string name;
     std::unordered_set<Card*> myCards;
+    int numCards;
 
 protected:
     Player();

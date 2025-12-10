@@ -5,7 +5,7 @@
 
 Player::Player() { *this = Player("Test"); }
 
-Player::Player(std::string inName) : name(inName), score(0) {}
+Player::Player(std::string inName) : name(inName), score(0), numCards(0) {}
 
 std::string Player::GetName() const { return name; }
 
@@ -30,10 +30,12 @@ void Player::PrintCards() const {
         (*it)->PrintCardShort(); 
         it++;
     }
+    std::cout << "\n";
 }
 
 bool Player::DrawCard(Card* drawCard){
     myCards.insert(drawCard);
+    numCards++;
     return true;
 }
 
@@ -42,7 +44,10 @@ Card* Player::DiscardCard(int discardVal, Suit discardSuit){
     std::unordered_set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
     if (itCardBeingDiscarded == myCards.end())
         return nullptr;
+
     auto nh = myCards.extract(*itCardBeingDiscarded);
+    numCards--;
+    
     return nh.value();
 }
 
@@ -51,5 +56,9 @@ Card* Player::DiscardRandomCard() {
     for (int i = 0; i < (rand() % myCards.size()); i++){
         it++;
     }
-    return *it;
+
+    auto nh = myCards.extract(it);
+    numCards--;
+    
+    return nh.value();
 }

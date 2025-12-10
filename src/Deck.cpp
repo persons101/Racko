@@ -33,13 +33,13 @@ Deck::Deck(int numCardsPerSuit, int numSuits, int numJokers){
 }
 
 Card* Deck::GetTopCard() {
-    Card* topCard = deck.at(0);
+    Card* topCard = new Card(*deck.at(0));
     deck.erase(deck.begin());
     return topCard;
     }
 
 Card* Deck::GetBottomCard() {
-    Card* bottomCard = deck.at(deck.size() - 1);
+    Card* bottomCard = new Card(*(deck.at(deck.size() - 1)));
     deck.pop_back();
     return bottomCard;
 }
