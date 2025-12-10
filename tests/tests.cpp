@@ -33,5 +33,27 @@ TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
     }
     SECTION("Player card management"){
         REQUIRE(GetCards().empty());
+        
+        REQUIRE(DrawCard(new Card(1, Suit::HEARTS)));
+
+        REQUIRE(GetCards().size() == 1);
+
+        for (int i = 2; i <= 10; i++){
+            REQUIRE(DrawCard(new Card(i, Suit::HEARTS)));
+        }
+
+        REQUIRE(GetCards().size() == 10);
+
+        Card* discardedCard = DiscardCard(5, Suit::HEARTS);
+
+        REQUIRE(discardedCard != nullptr);
+
+        REQUIRE(GetCards().size() == 9);
+
+        discardedCard = DiscardRandomCard();
+
+        REQUIRE(discardedCard != nullptr);
+        REQUIRE(discardedCard->getSuit() == HEARTS);
+        REQUIRE(GetCards().size() == 8);
     }
 }

@@ -5,7 +5,6 @@
 #define DECK_H
 
 #include <vector>
-#include <iostream>
 
 #include "card.h"
 

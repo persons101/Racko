@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 #include <string>
-#include <vector>
+#include <set>
 
 #include "card.h"
 
@@ -10,6 +10,8 @@ class Player {
 private:
     int score;
     std::string name;
+    std::set<Card*, Card::compareCards> myCards;
+    int numCards;
 
 protected:
     Player();
@@ -21,9 +23,12 @@ public:
     int GetScore() const;
     int AddScore(int);
 
-    virtual std::vector<Card*> GetCards() const;
+    virtual std::set<Card*, Card::compareCards> GetCards() const;
+    void PrintCards() const;
     bool DrawCard(Card*);
-    Card* DiscardCard(Card*);
+    Card* DiscardCard(int, Suit);
+    Card* DiscardRandomCard();
+
 };
 
 #endif

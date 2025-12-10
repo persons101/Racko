@@ -23,11 +23,18 @@ private:
 public:
     Card(int, Suit);
     int getValue() const;
+    virtual char getValueChar() const;
     Suit getSuit() const;
     std::string getSuitName() const;
+    std::string getSuitSymbol() const;
     bool isBlack() { return (int)suit % 2 == 1; }
 
-    static const std::string suit_name(Suit suit);
+    virtual void PrintCard() const;
+    virtual void PrintCardShort() const;
+
+    static const std::string suit_name(Suit);
+    struct compareCards { bool operator() (Card, Card) const; 
+                          bool operator() (Card*, Card*) const; };
 };
 
 #endif
