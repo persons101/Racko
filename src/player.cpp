@@ -32,6 +32,9 @@ void Player::PrintCards() const {
 }
 
 bool Player::DrawCard(Card* drawCard){
+    if (drawCard == nullptr)
+        return false;
+
     myCards.insert(drawCard);
     numCards++;
     return true;
