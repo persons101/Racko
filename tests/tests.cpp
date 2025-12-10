@@ -47,10 +47,7 @@ TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
         Card* discardedCard = DiscardCard(5, Suit::HEARTS);
 
         REQUIRE(discardedCard != nullptr);
-        if (discardedCard == nullptr){
-            PrintCards();
-        }
-        
+
         REQUIRE(GetCards().size() == 9);
 
         discardedCard = DiscardRandomCard();
