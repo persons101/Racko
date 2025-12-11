@@ -25,7 +25,7 @@ std::set<Card*, Card::compareCards> Player::GetCards() const {
 void Player::PrintCards() const {
     std::cout << name << "'s hand: ";
 
-    for (Card* card : myCards){
+    for (auto card : myCards){
         card->PrintCardShort();
     }
     std::cout << "\n";

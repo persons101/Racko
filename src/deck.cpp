@@ -21,10 +21,9 @@ Deck::Deck(int numCardsPerSuit, int numSuits){
 
 Deck::Deck(int numCardsPerSuit, int numSuits, int numJokers){
     this->numSuits = numSuits;
-    numCards = numSuits * numCardsPerSuit + numJokers;
 
     AddCardsToDeck(numCardsPerSuit, numSuits);
-    AddJokersToDeck(numJokers, numSuits);
+    AddJokersToDeck(numJokers);
 }
 
 Card* Deck::MakeNewCard(int cardValue, Suit cardSuit){
@@ -34,15 +33,17 @@ Card* Deck::MakeNewCard(int cardValue, Suit cardSuit){
 void Deck::AddCardsToDeck(int numCardsPerSuit, int numSuits){
     for (int i = 1; i <= numSuits; i++){
         for (int j = 1; j <= numCardsPerSuit; j++){
-            deck.push_back(MakeNewCard(j,(Suit)i));
+            deck.push_back(this->MakeNewCard(j,(Suit)i));
         }
     }
+    numCards += numSuits * numCardsPerSuit;
 }
 
-void Deck::AddJokersToDeck(int numJokers, int numSuits){
+void Deck::AddJokersToDeck(int numJokers){
     for (int i = 1; i <= numJokers; i++){
         deck.push_back(MakeNewCard(0, (Suit)i));
     }
+    numCards += numJokers;
 }
 
 Card* Deck::GetTopCard() {
@@ -52,7 +53,7 @@ Card* Deck::GetTopCard() {
     Card* topCard = new Card(*deck.at(0));
     deck.erase(deck.begin());
     return topCard;
-    }
+}
 
 Card* Deck::GetBottomCard() {
     if (deck.size() == 0)

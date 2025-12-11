@@ -55,7 +55,7 @@ std::string Card::getSuitSymbol() const {
         case HEARTS: return "\xe2\x99\xA5";
         case DIAMONDS: return "\xe2\x99\xA6";
         case CLUBS: return "\xe2\x99\xA3";
-        default: return "Suit " + std::to_string(static_cast<int>(suit));
+        default: return std::to_string(static_cast<int>(suit));
     }
 }
 
@@ -64,7 +64,7 @@ void Card::PrintCard() const {
 }
 
 void Card::PrintCardShort() const {
-    std::cout << getValueString() << getSuitSymbol() << " ";
+    std::cout << this->getValueString() << this->getSuitSymbol() << " ";
 }
 
 const std::string Card::suit_name(Suit suit)  {
