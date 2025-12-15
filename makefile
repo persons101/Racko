@@ -1,10 +1,11 @@
-SRC_DIR = ./src
-OBJ_DIR = ./obj
-BIN_DIR = ./bin
-TEST_DIR = ./tests
+SRC_DIR = src
+OBJ_DIR = obj
+BIN_DIR = bin
+TEST_DIR = tests
 
 CXX=g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -O2
+CXXFLAGS = -Wall -Wextra -std=c++17 -O2 -fdiagnostics-color=always
+DEBUG = 
 
 objects = card.o deck.o
 
@@ -18,17 +19,29 @@ bin:
 obj:
 	mkdir -p obj
 
-build: $(SRC_DIR)/*.cpp | bin obj
-	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
+# build: $(SRC_DIR)/*.cpp | bin obj
+# 	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
 
-$(OBJ_DIR)/deck.o: $(SRC_DIR)/deck.cpp 
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Find all C++ source files
+CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
 
-$(OBJ_DIR)/card.o: $(SRC_DIR)/card.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Generate corresponding object file names in the object directory
+OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SOURCES))
+OBJECTSNOMAIN := $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
+# Pattern rule to compile .cpp files into .o files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(OBJ_DIR) # Ensure the object directory exists
+	gcc -c $< -o $@
 
-tests: $(TEST_DIR)/catch_amalgamated.cpp $(TEST_DIR)/tests.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/$@.exe
+build: $(OBJECTS) | bin obj
+	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/Racko.exe
+
+
+tests: $(TEST_DIR)/catch_amalgamated.cpp $(TEST_DIR)/tests.cpp $(OBJECTSNOMAIN)
+	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/$@.exe
+
+testAndRun:	 build tests
+	./$(BIN_DIR)/tests.exe
 
 clean:
 	rm -rf obj/*.o
