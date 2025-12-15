@@ -1,3 +1,6 @@
+#define CATCH_CONFIG_MAIN
+#include "catch_amalgamated.hpp"
+
 #include "../src/card.h"
 #include "../src/Deck.h"
 #include "../src/racko.h"
@@ -5,8 +8,6 @@
 #include "../src/rackoCard.h"
 #include "../src/rackoDeck.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch_amalgamated.hpp"
 
 
 TEST_CASE("Testing Suit to string", "[Suit],[suit_name]"){
@@ -81,6 +82,7 @@ TEST_CASE("Player drawing from deck", "[Player][Player::DrawCard][Deck][Deck::Ge
     Player player1("Steve");
 
     REQUIRE(deck.GetNumCards() == 60);
+    REQUIRE(player1.GetCards().size() == 0);
 
     for (int suit = 1; suit <= 1; suit++)
         for (int cardVal = 1; cardVal <= 60; cardVal++)
@@ -95,4 +97,5 @@ TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
 
     REQUIRE(deck.GetNumCards() == 60);
     REQUIRE(deck.GetTopCard());
+    //REQUIRE(deck.GetTopCard()/*== SPECIFIC CARD*/)
 }

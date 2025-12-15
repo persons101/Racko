@@ -40,9 +40,11 @@ bool Player::DrawCard(Card* drawCard){
     return true;
 }
 
+// TODO add Player::DiscardCard(Card*)
+
 Card* Player::DiscardCard(int discardVal, Suit discardSuit){
-    Card cardToDiscard(discardVal, discardSuit);
-    std::set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard);
+    Card cardToDiscard(discardVal, discardSuit);                                         // this should prolly be changed
+    std::set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard); // this might be weird with derived Card types
     if (itCardBeingDiscarded == myCards.end())
         return nullptr;
 

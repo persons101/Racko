@@ -19,9 +19,7 @@ Deck::Deck(int numCardsPerSuit, int numSuits){
 }
 
 
-Deck::Deck(int numCardsPerSuit, int numSuits, int numJokers){
-    this->numSuits = numSuits;
-
+Deck::Deck(int numCardsPerSuit, int numSuits, int numJokers) : numSuits(numSuits), numCards(0) {
     AddCardsToDeck(numCardsPerSuit, numSuits);
     AddJokersToDeck(numJokers);
 }
