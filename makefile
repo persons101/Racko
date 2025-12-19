@@ -7,37 +7,44 @@ CXX=g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -O2 -fdiagnostics-color=always
 DEBUG = 
 
-objects = card.o deck.o
+# Find all C++ source files
+CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
+TEST_SOURCES := $(wildcard $(TEST_DIR)/*.cpp)
+
+# Generate corresponding object file names in the object directory
+OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SOURCES))
+
+TEST_OBJECTS = $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
+TEST_OBJECTS += $(patsubst $(TEST_DIR)/%.cpp, $(TEST_DIR)/$(OBJ_DIR)/%.o, $(TEST_SOURCES))
 
 .PHONY: all build tests clean
 
 all: build clean
 
-bin:
-	mkdir -p bin
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
 
-obj:
-	mkdir -p obj
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(TEST_DIR)/$(OBJ_DIR):
+	mkdir -p $@
 
 # build: $(SRC_DIR)/*.cpp | bin obj
 # 	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
 
-# Find all C++ source files
-CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
-
-# Generate corresponding object file names in the object directory
-OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SOURCES))
-OBJECTSNOMAIN := $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
 # Pattern rule to compile .cpp files into .o files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR) # Ensure the object directory exists
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	gcc -c $< -o $@
 
-build: $(OBJECTS) | bin obj
+$(TEST_DIR)/$(OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_DIR)/$(OBJ_DIR)
+	gcc -c $< -o $@
+
+build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/Racko.exe
 
 
-tests: $(TEST_DIR)/catch_amalgamated.cpp $(TEST_DIR)/tests.cpp $(OBJECTSNOMAIN)
+tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/$@.exe
 
 testAndRun:	 build tests
