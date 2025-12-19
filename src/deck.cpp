@@ -28,6 +28,10 @@ Card* Deck::MakeNewCard(int cardValue, Suit cardSuit){
     return new Card(cardValue, cardSuit);
 }
 
+Card* Deck::MakeNewCard(Card* originalCard){
+    return new Card(*originalCard);
+}
+
 void Deck::AddCardsToDeck(int numCardsPerSuit, int numSuits){
     for (int i = 1; i <= numSuits; i++){
         for (int j = 1; j <= numCardsPerSuit; j++){

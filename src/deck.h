@@ -17,6 +17,7 @@ private:
 
 protected:
     virtual Card* MakeNewCard(int, Suit);
+    virtual Card* MakeNewCard(Card*);
     virtual void AddCardsToDeck(int numCardsPerSuit, int numSuits);
     virtual void AddJokersToDeck(int numJokers);
 
