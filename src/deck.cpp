@@ -54,6 +54,8 @@ Card* Deck::GetTopCard() {
 
     Card* topCard = new Card(*deck.at(0));
     deck.erase(deck.begin());
+    numCards--;
+
     return topCard;
 }
 
@@ -63,6 +65,8 @@ Card* Deck::GetBottomCard() {
 
     Card* bottomCard = new Card(*(deck.at(deck.size() - 1)));
     deck.pop_back();
+    numCards--;
+
     return bottomCard;
 }
 
