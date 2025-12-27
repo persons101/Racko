@@ -96,6 +96,8 @@ TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
     RackoDeck deck;
 
     REQUIRE(deck.GetNumCards() == 60);
-    REQUIRE(deck.GetTopCard());
-    //REQUIRE(deck.GetTopCard()/*== SPECIFIC CARD*/)
+
+    Card* topCard = deck.GetTopCard();
+    REQUIRE(topCard != nullptr);
+    REQUIRE( ( (*topCard) == std::make_tuple(1, (Suit)0)) );
 }
