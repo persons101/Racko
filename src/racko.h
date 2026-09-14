@@ -10,18 +10,43 @@
 #include "rackoCard.h"
 
 class Racko {
-private: 
+    int numTurns = 0;
+    int playerCnt = 0;
+    int cardsInDeck = 60;
+    int cardsInDiscard = 0;
+protected:
+    Deck deck;
     std::stack<Card*> discardPile;
     std::vector<Player*> playerVector;
 
-protected:
-    Deck deck;
+    int CalculateRackScore(std::vector<Card*>&) const;
+
+    void PlayTurnForPlayerByIdx(int playerIdx);
+    void PlayTurnForPlayerByName(std::string playerName);
+    void ResetPlayers();
+    
+
 
 public:
+    int GetNumTurns() const;
+    int GetPlayerCount() const;
+    int GetDeckCardCount() const;
+    int GetDiscardCardCount() const;
+
     Card* GetTopCardFromDeck();
     Card* GetTopCardFromDiscard();
-    std::vector<Card*> GetPlayerCards(int playerIdx);
-    std::vector<Card*> GetPlayerCards(std::string playerName);
+    std::vector<Card*> GetPlayerCardsByIdx(int playerIdx);
+    std::vector<Card*> GetPlayerCardsByName(std::string playerName);
+    Player* GetPlayerByIdx(int playerIdx);
+    Player* GetPlayerByName(std::string playerName);
+    
+    void ScoreRackByIdx(std::vector<Card*>, int playerIdx);
+    void ScoreRackByName(std::vector<Card*>, std::string playerName);
+    
+    void SetupGame();
+    void PlayTurn();
+    void FinishGame();
+    void ResetGame();
     
 };
 
