@@ -94,6 +94,11 @@
             "cwd": "c:\\Users\\willi\\OneDrive\\Coding\\Racko\\bin",
             "binaryPath": "c:\\Users\\willi\\OneDrive\\Coding\\Racko\\bin\\Racko.exe",
             "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\willi\\OneDrive\\Coding\\Racko\\bin",
+            "binaryPath": "c:\\Users\\willi\\OneDrive\\Coding\\Racko\\bin\\tests.exe",
+            "binaryArgs": []
         }
     ],
     "makefile.makefilePath": "",

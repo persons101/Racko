@@ -1,10 +1,14 @@
-#include "../src/Card.cpp"
-#include "../src/Deck.cpp"
-#include "../src/Game.cpp"
-#include "../src/Player.cpp"
-
 #define CATCH_CONFIG_MAIN
 #include "catch_amalgamated.hpp"
+
+#include <iostream>
+#include "../src/card.h"
+#include "../src/Deck.h"
+#include "../src/racko.h"
+#include "../src/player.h"
+#include "../src/rackoCard.h"
+#include "../src/rackoDeck.h"
+
 
 
 TEST_CASE("Testing Suit to string", "[Suit],[suit_name]"){
@@ -22,7 +26,7 @@ TEST_CASE("Testing Suit to int", "[Suit]"){
 }
 
 TEST_CASE("Game class creation", "[Game],[constructor]"){
-    Game game;
+    Racko game;
 }
 
 TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
@@ -56,4 +60,70 @@ TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
         REQUIRE(discardedCard->getSuit() == HEARTS);
         REQUIRE(GetCards().size() == 8);
     }
+
+    SECTION("Full deck card management"){
+        Player player1("Steve");
+
+        for (int suit = 1; suit <= 4; suit++)
+            for (int cardVal = 1; cardVal <= 13; cardVal++)
+                player1.DrawCard(new Card(cardVal, (Suit)suit));
+
+        REQUIRE(player1.GetCards().size() == 13*4);
+
+        for (int suit = 1; suit <= 4; suit++)
+            for (int cardVal = 1; cardVal <= 13; cardVal++)
+                player1.DiscardRandomCard();
+
+        REQUIRE(player1.GetCards().size() == 0);
+    }
+}
+
+TEST_CASE("Player drawing from deck", "[Player][Player::DrawCard][Deck][Deck::GetTopCard]"){
+    Deck deck(60,1);
+    Player player1("Steve");
+
+    REQUIRE(deck.GetNumCards() == 60);
+    REQUIRE(player1.GetCards().size() == 0);
+
+    for (int suit = 1; suit <= 1; suit++)
+        for (int cardVal = 1; cardVal <= 60; cardVal++)
+            player1.DrawCard(deck.GetTopCard());
+
+    REQUIRE(deck.GetNumCards() == 0);
+    REQUIRE(player1.GetCards().size() == 60);
+}
+
+TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
+    RackoDeck deck;
+
+    REQUIRE(deck.GetNumCards() == 60);
+
+    Card* topCard = deck.GetTopCard();
+    REQUIRE(topCard != nullptr);
+    REQUIRE( ( (*topCard) == std::make_tuple(1, (Suit)0)) );
+}
+
+TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
+{
+    /// GOAL: Create RackoCards with values 1, 11, 12, and 13, (usually A, J, Q, K), and confirm they print numbers and not letters. This ensures the polymorphism is working
+
+    // Save original buffer
+    auto old_buf = std::cout.rdbuf();
+
+    // Redirect cout to a stringstream
+    std::stringstream oss;
+    std::cout.rdbuf(oss.rdbuf());
+
+    // Execute code that writes to cout
+    auto cardValue = GENERATE(1, 11, 12, 13);
+
+    RackoCard rackoCard(cardValue);
+    rackoCard.PrintCardShort();
+
+
+    // Restore original buffer
+    std::cout.rdbuf(old_buf);
+
+    // Check the captured output
+    REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) + " ") );
 }

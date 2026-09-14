@@ -1,34 +1,54 @@
-SRC_DIR = ./src
-OBJ_DIR = ./obj
-BIN_DIR = ./bin
-TEST_DIR = ./tests
+SRC_DIR = src
+OBJ_DIR = obj
+BIN_DIR = bin
+TEST_DIR = tests
 
-CXX=g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -O2
+CXX ?= g++
+CXXFLAGS = -Wall -Wextra -std=c++17 -O2 -fdiagnostics-color=always
+DEBUG = 
 
-objects = card.o deck.o
+# Find all C++ source files
+CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
+TEST_SOURCES := $(wildcard $(TEST_DIR)/*.cpp)
+
+# Generate corresponding object file names in the object directory
+OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SOURCES))
+
+TEST_OBJECTS = $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
+TEST_OBJECTS += $(patsubst $(TEST_DIR)/%.cpp, $(TEST_DIR)/$(OBJ_DIR)/%.o, $(TEST_SOURCES))
 
 .PHONY: all build tests clean
 
 all: build clean
 
-bin:
-	mkdir -p bin
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
 
-obj:
-	mkdir -p obj
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
 
-build: $(SRC_DIR)/*.cpp | bin obj
-	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
+$(TEST_DIR)/$(OBJ_DIR):
+	mkdir -p $@
 
-$(OBJ_DIR)/deck.o: $(SRC_DIR)/deck.cpp 
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# build: $(SRC_DIR)/*.cpp | bin obj
+# 	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
 
-$(OBJ_DIR)/card.o: $(SRC_DIR)/card.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Pattern rule to compile .cpp files into .o files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 
-tests: $(TEST_DIR)/catch_amalgamated.cpp $(TEST_DIR)/tests.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/$@.exe
+$(TEST_DIR)/$(OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_DIR)/$(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
+
+build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/Racko.exe
+
+
+tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/$@.exe
+
+testAndRun: build tests
+	./$(BIN_DIR)/tests.exe
 
 clean:
 	rm -rf obj/*.o
