@@ -105,7 +105,7 @@ TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
 
 TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
 {
-    /// GOAL: Create RackoCards with values 1, 11, 12, and 13, (usually A, J, Q, K), and confirm they print numbers and not letters. This ensures the polymorphism is working
+    /// GOAL: Create RackoCards with values 1, 11, 12, and 13, (usually A, J, Q, K), and confirm they print numbers and not letters. This ensures the inheritance is working
 
     // Save original buffer
     auto old_buf = std::cout.rdbuf();
