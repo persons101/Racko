@@ -44,11 +44,12 @@ build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/Racko.exe
 
 
-tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR)
+tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/$@.exe
 
 testAndRun: build tests
 	./$(BIN_DIR)/tests.exe
 
 clean:
-	rm -rf obj/*.o
+	rm -rf $(OBJ_DIR)/*.o
+	rm -rf $(TEST_DIR)/$(OBJ_DIR)/*.o
