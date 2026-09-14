@@ -21,6 +21,7 @@ private:
 
 public:
     Card(int, Suit);
+    Card(std::tuple<int, Suit>);
     int getValue() const;
     virtual char getValueChar() const;
     virtual std::string getValueString() const;
@@ -40,6 +41,8 @@ public:
     struct compareCards { virtual bool operator() (const Card, const Card) const; 
                           virtual bool operator() (const Card*, const Card*) const; 
                           virtual bool operator() (const Card* lhs, const Card rhs) const { return (lhs < &rhs);  }
+                          virtual bool operator() (const Card, const std::tuple<int,Suit>) const; 
+                          virtual bool operator() (const Card*, const std::tuple<int,Suit>) const; 
                         };
 };
 

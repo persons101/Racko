@@ -52,7 +52,7 @@ Card* Deck::GetTopCard() {
     if (deck.size() == 0)
         return nullptr;
 
-    Card* topCard = new Card(*deck.at(0));
+    Card* topCard = deck.at(0);
     deck.erase(deck.begin());
     numCards--;
 
@@ -63,7 +63,7 @@ Card* Deck::GetBottomCard() {
     if (deck.size() == 0)
         return nullptr;
 
-    Card* bottomCard = new Card(*(deck.at(deck.size() - 1)));
+    Card* bottomCard = deck.at(deck.size() - 1);
     deck.pop_back();
     numCards--;
 

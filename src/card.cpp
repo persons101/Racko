@@ -8,6 +8,10 @@ Card::Card(int newValue, Suit newSuit){
     suit = newSuit;
 }
 
+Card::Card(std::tuple<int, Suit> vals) {
+    *this = Card(std::get<0>(vals), std::get<1>(vals));
+}
+
 int Card::getValue() const {
     return value;
 }
@@ -110,4 +114,16 @@ bool Card::compareCards::operator() (const Card* a, const Card* b) const {
     if (a->suit == b->suit)
         return a->value < b->value;
     return (int)a->suit < (int)b->suit;
+};
+
+bool Card::compareCards::operator() (const Card a, const std::tuple<int,Suit> b) const {
+    if (a.suit == std::get<1>(b))
+        return a.value < std::get<0>(b);
+    return (int)a.suit < (int)(std::get<1>(b));
+};
+
+bool Card::compareCards::operator() (const Card* a, const std::tuple<int,Suit> b) const {
+    if (a->suit == std::get<1>(b))
+        return a->value < std::get<0>(b);
+    return (int)a->suit < (int)(std::get<1>(b));
 };

@@ -3,7 +3,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 TEST_DIR = tests
 
-CXX=g++
+CXX ?= g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -O2 -fdiagnostics-color=always
 DEBUG = 
 
@@ -35,10 +35,10 @@ $(TEST_DIR)/$(OBJ_DIR):
 
 # Pattern rule to compile .cpp files into .o files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
-	$(CXX) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 
 $(TEST_DIR)/$(OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_DIR)/$(OBJ_DIR)
-	$(CXX) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 
 build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/Racko.exe
