@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch_amalgamated.hpp"
 
+#include <iostream>
 #include "../src/card.h"
 #include "../src/Deck.h"
 #include "../src/racko.h"
@@ -96,6 +97,33 @@ TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
     RackoDeck deck;
 
     REQUIRE(deck.GetNumCards() == 60);
-    REQUIRE(deck.GetTopCard());
-    //REQUIRE(deck.GetTopCard()/*== SPECIFIC CARD*/)
+
+    Card* topCard = deck.GetTopCard();
+    REQUIRE(topCard != nullptr);
+    REQUIRE( ( (*topCard) == std::make_tuple(1, (Suit)0)) );
+}
+
+TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
+{
+    /// GOAL: Create RackoCards with values 1, 11, 12, and 13, (usually A, J, Q, K), and confirm they print numbers and not letters. This ensures the polymorphism is working
+
+    // Save original buffer
+    auto old_buf = std::cout.rdbuf();
+
+    // Redirect cout to a stringstream
+    std::stringstream oss;
+    std::cout.rdbuf(oss.rdbuf());
+
+    // Execute code that writes to cout
+    auto cardValue = GENERATE(1, 11, 12, 13);
+
+    RackoCard rackoCard(cardValue);
+    rackoCard.PrintCardShort();
+
+
+    // Restore original buffer
+    std::cout.rdbuf(old_buf);
+
+    // Check the captured output
+    REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) + " ") );
 }

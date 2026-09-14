@@ -1,10 +1,15 @@
 #include "card.h"
 
 #include <iostream>
+#include <tuple>
 
 Card::Card(int newValue, Suit newSuit){
     this->value = newValue;
     suit = newSuit;
+}
+
+Card::Card(std::tuple<int, Suit> vals) {
+    *this = Card(std::get<0>(vals), std::get<1>(vals));
 }
 
 int Card::getValue() const {
@@ -77,14 +82,48 @@ const std::string Card::suit_name(Suit suit)  {
     }
 }
 
-bool Card::compareCards::operator() (Card a, Card b) const {
+auto Card::tied() const { return std::tie(value, suit); }
+
+bool Card::operator==(const Card& rhs) const {
+    return tied() == rhs.tied();
+}
+
+bool operator==(const Card& lhs, const std::tuple<int, Suit>& rhs) {
+    return lhs.tied() == rhs;
+}
+
+bool operator==(const std::tuple<int, Suit>& lhs, const Card& rhs){
+    return rhs == lhs; // related to above
+}
+
+bool operator!=(const Card& lhs, const std::tuple<int, Suit>& rhs) {
+    return !(lhs.tied() == rhs);
+}
+
+bool operator!=(const std::tuple<int, Suit>& lhs, const Card& rhs){
+    return rhs != lhs; // related to above
+}
+
+bool Card::compareCards::operator() (const Card a, const Card b) const {
     if (a.suit == b.suit)
         return a.value < b.value;
     return (int)a.suit < (int)b.suit;
 };
 
-bool Card::compareCards::operator() (Card* a, Card* b) const {
+bool Card::compareCards::operator() (const Card* a, const Card* b) const {
     if (a->suit == b->suit)
         return a->value < b->value;
     return (int)a->suit < (int)b->suit;
+};
+
+bool Card::compareCards::operator() (const Card a, const std::tuple<int,Suit> b) const {
+    if (a.suit == std::get<1>(b))
+        return a.value < std::get<0>(b);
+    return (int)a.suit < (int)(std::get<1>(b));
+};
+
+bool Card::compareCards::operator() (const Card* a, const std::tuple<int,Suit> b) const {
+    if (a->suit == std::get<1>(b))
+        return a->value < std::get<0>(b);
+    return (int)a->suit < (int)(std::get<1>(b));
 };
