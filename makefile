@@ -35,10 +35,10 @@ $(TEST_DIR)/$(OBJ_DIR):
 
 # Pattern rule to compile .cpp files into .o files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
-	gcc -c $< -o $@
+	$(CXX) -c $< -o $@
 
 $(TEST_DIR)/$(OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_DIR)/$(OBJ_DIR)
-	gcc -c $< -o $@
+	$(CXX) -c $< -o $@
 
 build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/Racko.exe
@@ -47,7 +47,7 @@ build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
 tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/$@.exe
 
-testAndRun:	 build tests
+testAndRun: build tests
 	./$(BIN_DIR)/tests.exe
 
 clean:
