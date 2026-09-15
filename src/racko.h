@@ -10,12 +10,13 @@
 #include "rackoCard.h"
 
 class Racko {
+private:
     int numTurns = 0;
     int playerCnt = 0;
     int cardsInDeck = 60;
     int cardsInDiscard = 0;
 protected:
-    Deck deck;
+    Deck* deck;
     std::stack<Card*> discardPile;
     std::vector<Player*> playerVector;
 
@@ -24,10 +25,13 @@ protected:
     void PlayTurnForPlayerByIdx(int playerIdx);
     void PlayTurnForPlayerByName(std::string playerName);
     void ResetPlayers();
-    
+    void AddPlayer(std::string);
+    void AddPlayer(Player*);
 
 
 public:
+    Racko();
+
     int GetNumTurns() const;
     int GetPlayerCount() const;
     int GetDeckCardCount() const;
@@ -40,8 +44,8 @@ public:
     Player* GetPlayerByIdx(int playerIdx);
     Player* GetPlayerByName(std::string playerName);
     
-    void ScoreRackByIdx(std::vector<Card*>, int playerIdx);
-    void ScoreRackByName(std::vector<Card*>, std::string playerName);
+    void ScoreRackByIdx(int playerIdx);
+    void ScoreRackByName(std::string playerName);
     
     void SetupGame();
     void PlayTurn();
