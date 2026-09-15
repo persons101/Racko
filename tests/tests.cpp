@@ -8,6 +8,8 @@
 #include "../src/player.h"
 #include "../src/rackoCard.h"
 #include "../src/rackoDeck.h"
+#include "src/testDeck.h"
+#include "src/testPlayer.h"
 
 
 
@@ -126,4 +128,71 @@ TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
 
     // Check the captured output
     REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) + " ") );
+}
+
+TEST_CASE_METHOD(TestPlayer, "TestPlayer functions", "[TestPlayer]") {
+    SetTestName("Steve");
+    std::vector<Card*> cards = GetCards(); // 1,5,10,15,20,25,30,35,36,38,40,2,3,4,6 
+    REQUIRE(CalculateRackScore(cards) == 11 * 5);
+    REQUIRE(AddScore(CalculateRackScore(cards)) == 55);
+    REQUIRE(GetScore() == 55);
+
+}
+
+TEST_CASE_METHOD(Racko, "Racko game initialization", "[Racko]") {
+    REQUIRE(GetNumTurns() == 0);
+    REQUIRE(GetDeckCardCount() == 60);
+    REQUIRE(GetDiscardCardCount() == 0);
+    REQUIRE(GetPlayerCount() == 0);
+}
+
+TEST_CASE_METHOD(Racko, "Racko game score calculation", "[Racko][RackoCard][Score][Player]") {
+    // https://www.hasbro.com/common/instruct/Racko%281987%29.PDF
+    RackoCard* card1 = new RackoCard(1);
+    RackoCard* card2 = new RackoCard(2);
+    RackoCard* card3 = new RackoCard(3);
+    RackoCard* card4 = new RackoCard(4);
+    RackoCard* card5 = new RackoCard(5);
+    RackoCard* card6 = new RackoCard(6);
+
+    SECTION("Check Calculations") {
+        std::vector<Card*> oneCard = {card6, card2, card3, card5, card4, card1};
+        std::vector<Card*> fourCards = {card1, card2, card3, card5, card4, card6};
+        std::vector<Card*> fiveCards = {card1, card2, card3, card4, card6, card5};
+
+        REQUIRE(CalculateRackScore(fourCards) == (4 * 5)); 
+        REQUIRE(CalculateRackScore(fiveCards) == (5 * 5));
+
+    }
+
+    SECTION("Add Player by name") {
+        Player p1 = Player("Steve");
+        AddPlayer("Steve");
+        REQUIRE(GetPlayerCount() == 1);
+        REQUIRE(p1.GetName() == GetPlayerByIdx(0)->GetName());
+    }
+
+    SECTION("Add Player by reference") {
+        Player p1 = Player("Steve");
+        TestPlayer* p2 = new TestPlayer("Steve");
+        AddPlayer(&p1);
+        AddPlayer(p2);
+        REQUIRE(GetPlayerCount() == 2);
+
+        REQUIRE(p1.GetName() == GetPlayerByIdx(1)->GetName());
+
+    SECTION("One player turn") {
+        TestPlayer* p1 = new TestPlayer("Steve");
+        AddPlayer(p1);
+        REQUIRE(GetPlayerCount() == 1);
+
+        REQUIRE(p1->GetName() == GetPlayerByIdx(0)->GetName());
+        
+        TestDeck testDeck; // top on left: 1,2,3,4,5
+        deck = testDeck;
+        PlayTurnForPlayerByIdx(0);
+
+        REQUIRE(GetPlayerByIdx(0)->GetCards() == std::vector({1,5,10,15,20,25,30,35,36,38,40,2,3,4,6 }));
+    }
+
 }
