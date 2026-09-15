@@ -11,12 +11,11 @@
 
 class Deck {
 private:
-    std::vector<Card*> deck;
     int numCards;
     int numSuits;
 
 protected:
-    std::vector<Card*> GetCards() const { return deck; }
+    std::vector<Card*> deck;
     virtual Card* MakeNewCard(int, Suit);
     virtual Card* MakeNewCard(Card*);
     virtual void AddCardsToDeck(int numCardsPerSuit, int numSuits);
@@ -24,12 +23,14 @@ protected:
 
 public:
     Deck();
+    ~Deck();
     Deck(int numCardsPerSuit, int numSuits);
     Deck(int numCardsPerSuit, int numSuits, int numJokers);
     void Shuffle();
     Card* GetTopCard();
     Card* GetBottomCard();
     int GetNumCards() const { return numCards;}
+    std::vector<Card*> GetCards() const { return deck; }
     virtual void PrintDeck() const;
 };
 

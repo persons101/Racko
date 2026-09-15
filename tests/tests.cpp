@@ -130,12 +130,12 @@ TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
     REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) + " ") );
 }
 
-TEST_CASE_METHOD(TestPlayer, "TestPlayer functions", "[TestPlayer]") {
-    SetTestName("Steve");
-    std::vector<Card*> cards = GetCards(); // 1,5,10,15,20,25,30,35,36,38,40,2,3,4,6 
+TEST_CASE_METHOD(Racko, "TestPlayer functions", "[TestPlayer][Racko]") {
+    TestPlayer p1;
+    std::vector<Card*> cards = p1.GetCards(); // 1,5,10,15,20,25,30,35,36,38,40,2,3,4,6 
     REQUIRE(CalculateRackScore(cards) == 11 * 5);
-    REQUIRE(AddScore(CalculateRackScore(cards)) == 55);
-    REQUIRE(GetScore() == 55);
+    REQUIRE(p1.AddScore(CalculateRackScore(cards)) == 55);
+    REQUIRE(p1.GetScore() == 55);
 
 }
 
@@ -166,33 +166,34 @@ TEST_CASE_METHOD(Racko, "Racko game score calculation", "[Racko][RackoCard][Scor
     }
 
     SECTION("Add Player by name") {
-        Player p1 = Player("Steve");
+        Player p1("Steve");
         AddPlayer("Steve");
         REQUIRE(GetPlayerCount() == 1);
         REQUIRE(p1.GetName() == GetPlayerByIdx(0)->GetName());
     }
 
     SECTION("Add Player by reference") {
-        Player p1 = Player("Steve");
+        Player p1("Steve");
         TestPlayer* p2 = new TestPlayer("Steve");
         AddPlayer(&p1);
         AddPlayer(p2);
         REQUIRE(GetPlayerCount() == 2);
 
         REQUIRE(p1.GetName() == GetPlayerByIdx(1)->GetName());
+    }
 
     SECTION("One player turn") {
-        TestPlayer* p1 = new TestPlayer("Steve");
+        TestPlayer* p1 = new TestPlayer("Steve"); // {1,5,10,18,20,25,30,35,36,38,40,2,3,4,6 }
         AddPlayer(p1);
         REQUIRE(GetPlayerCount() == 1);
 
         REQUIRE(p1->GetName() == GetPlayerByIdx(0)->GetName());
-        
-        TestDeck testDeck; // top on left: 1,2,3,4,5
+
+        TestDeck* testDeck = new TestDeck(); // top on left: 11,12,13,14,15
         deck = testDeck;
         PlayTurnForPlayerByIdx(0);
 
-        REQUIRE(GetPlayerByIdx(0)->GetCards() == std::vector({1,5,10,15,20,25,30,35,36,38,40,2,3,4,6 }));
+        REQUIRE(GetPlayerByIdx(0)->GetCardVals() == std::vector({1,5,10,11,20,25,30,35,36,38,40,2,3,4,6 }));
     }
 
 }

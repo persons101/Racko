@@ -14,6 +14,13 @@ Deck::Deck() {
     *this = Deck(13, 4, 0);
 }
 
+Deck::~Deck()
+{
+    for (auto card : deck) {
+        delete card;
+    }
+}
+
 Deck::Deck(int numCardsPerSuit, int numSuits){
     *this = Deck(numCardsPerSuit, numSuits, 0);
 }

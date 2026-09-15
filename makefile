@@ -9,13 +9,17 @@ DEBUG =
 
 # Find all C++ source files
 CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
-TEST_SOURCES := $(wildcard $(TEST_DIR)/*.cpp)
+TEST_ROOT_SOURCES := $(wildcard $(TEST_DIR)/*.cpp)
+TEST_SRC_SOURCES := $(wildcard $(TEST_DIR)/$(SRC_DIR)/*.cpp)
 
 # Generate corresponding object file names in the object directory
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SOURCES))
 
-TEST_OBJECTS = $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
-TEST_OBJECTS += $(patsubst $(TEST_DIR)/%.cpp, $(TEST_DIR)/$(OBJ_DIR)/%.o, $(TEST_SOURCES))
+TEST_ROOT_OBJECTS := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_DIR)/$(OBJ_DIR)/%.o,$(TEST_ROOT_SOURCES))
+TEST_SRC_OBJECTS := $(patsubst $(TEST_DIR)/$(SRC_DIR)/%.cpp,$(TEST_DIR)/$(OBJ_DIR)/%.o,$(TEST_SRC_SOURCES))
+
+TEST_OBJECTS := $(filter-out $(OBJ_DIR)/main.o,$(OBJECTS))
+TEST_OBJECTS += $(TEST_ROOT_OBJECTS) $(TEST_SRC_OBJECTS)
 
 .PHONY: all build tests clean
 
@@ -38,6 +42,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 
 $(TEST_DIR)/$(OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_DIR)/$(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
+
+$(TEST_SRC_OBJECTS): $(TEST_DIR)/$(OBJ_DIR)/%.o: $(TEST_DIR)/$(SRC_DIR)/%.cpp | $(TEST_DIR)/$(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 
 build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)

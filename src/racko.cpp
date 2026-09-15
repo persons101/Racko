@@ -19,6 +19,11 @@ int Racko::CalculateRackScore(std::vector<Card *>& cards) const
     return score;
 }
 
+Racko::Racko()
+{
+    
+}
+
 int Racko::GetNumTurns() const
 {
     return numTurns;
