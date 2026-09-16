@@ -97,8 +97,15 @@ int Racko::GetDiscardCardCount() const
 
 void Racko::PlayTurn()
 {
-    for (int i = 0; i < playerVector.size(); i++) {
-        PlayTurnForPlayerByIdx(i);
+    bool isRoundOver = false;
+    for (int i = 0; i < playerVector.size() && !isRoundOver; i++) {
+        int playerScore = 0;
+        playerScore = PlayTurnForPlayerByIdx(i);
+
+        if (playerScore != 0) {
+            isRoundOver = true;
+            // TODO SCORE ALL PLAYERS
+        }
     }
 }
 
