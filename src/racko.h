@@ -20,13 +20,13 @@ protected:
     std::stack<Card*> discardPile;
     std::vector<Player*> playerVector;
 
-    int CalculateRackScore(std::vector<Card*>&) const;
+    virtual int CalculateRackScore(std::vector<Card*>&) const;
 
-    void PlayTurnForPlayerByIdx(int playerIdx);
-    void PlayTurnForPlayerByName(std::string playerName);
+    virtual int PlayTurnForPlayerByIdx(int playerIdx);
+    virtual int PlayTurnForPlayerByName(std::string playerName);
     void ResetPlayers();
-    void AddPlayer(std::string);
-    void AddPlayer(Player*);
+    virtual void AddPlayer(std::string);
+    virtual void AddPlayer(Player*);
 
 
 public:
@@ -47,10 +47,10 @@ public:
     void ScoreRackByIdx(int playerIdx);
     void ScoreRackByName(std::string playerName);
     
-    void SetupGame();
-    void PlayTurn();
-    void FinishGame();
-    void ResetGame();
+    virtual void SetupGame();
+    virtual void PlayTurn();
+    virtual int FinishGame();
+    virtual void ResetGame();
     
 };
 
