@@ -27,9 +27,11 @@ public:
     Deck(int numCardsPerSuit, int numSuits);
     Deck(int numCardsPerSuit, int numSuits, int numJokers);
     void Shuffle();
-    Card* GetTopCard();
-    Card* GetBottomCard();
-    int GetNumCards() const { return numCards;}
+    Card* PopTopCard();
+    Card* PopBottomCard();
+    Card* GetTopCard() const;
+    Card* GetBottomCard() const;
+    int GetNumCards() const { return numCards; }
     std::vector<Card*> GetCards() const { return deck; }
     virtual void PrintDeck() const;
 };

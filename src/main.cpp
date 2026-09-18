@@ -7,7 +7,7 @@ int main() {
     RackoDeck deck;
     Player player1("Steve");
 
-    while (player1.DrawCard(deck.GetTopCard()));
+    while (player1.DrawCard(deck.PopTopCard()));
 
     player1.PrintCards();
 

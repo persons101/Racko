@@ -80,7 +80,7 @@ TEST_CASE_METHOD(Player, "Player class creation", "[Player],[constructor]"){
     }
 }
 
-TEST_CASE("Player drawing from deck", "[Player][Player::DrawCard][Deck][Deck::GetTopCard]"){
+TEST_CASE("Player drawing from deck", "[Player][Player::DrawCard][Deck][Deck::PopTopCard]"){
     Deck deck(60,1);
     Player player1("Steve");
 
@@ -89,7 +89,7 @@ TEST_CASE("Player drawing from deck", "[Player][Player::DrawCard][Deck][Deck::Ge
 
     for (int suit = 1; suit <= 1; suit++)
         for (int cardVal = 1; cardVal <= 60; cardVal++)
-            player1.DrawCard(deck.GetTopCard());
+            player1.DrawCard(deck.PopTopCard());
 
     REQUIRE(deck.GetNumCards() == 0);
     REQUIRE(player1.GetCards().size() == 60);
@@ -100,7 +100,7 @@ TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
 
     REQUIRE(deck.GetNumCards() == 60);
 
-    Card* topCard = deck.GetTopCard();
+    Card* topCard = deck.PopTopCard();
     REQUIRE(topCard != nullptr);
     REQUIRE( ( (*topCard) == std::make_tuple(1, (Suit)0)) );
 }
@@ -127,7 +127,7 @@ TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
     std::cout.rdbuf(old_buf);
 
     // Check the captured output
-    REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) + " ") );
+    REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) ) );
 }
 
 TEST_CASE_METHOD(Racko, "TestPlayer functions", "[TestPlayer][Racko]") {
@@ -197,3 +197,5 @@ TEST_CASE_METHOD(Racko, "Racko game score calculation", "[Racko][RackoCard][Scor
     }
 
 }
+
+TEST_CASE_METHOD(Racko, "")

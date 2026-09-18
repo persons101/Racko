@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <string>
 
 Card::Card(int newValue, Suit newSuit){
     this->value = newValue;
@@ -64,12 +65,12 @@ std::string Card::getSuitSymbol() const {
     }
 }
 
-void Card::PrintCard() const {
-    std::cout << "Card Value: " << value << ", Suit: " << suit_name(suit) << std::endl;
+std::string Card::PrintCard() const {
+    return "Card Value: " + std::to_string( value ) + ", Suit: " + suit_name(suit);
 }
 
-void Card::PrintCardShort() const {
-    std::cout << this->getValueString() << this->getSuitSymbol() << " ";
+std::string Card::PrintCardShort() const {
+    return this->getValueString() + this->getSuitSymbol();
 }
 
 const std::string Card::suit_name(Suit suit)  {

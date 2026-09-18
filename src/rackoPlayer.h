@@ -7,4 +7,5 @@ public:
     RackoPlayer(std::string);
 
 	Card* DiscardCard(int cardPos, Suit suit = (Suit)0) override;
+    virtual bool IsCompletedWithRack();
 };

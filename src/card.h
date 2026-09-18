@@ -30,8 +30,8 @@ public:
     virtual std::string getSuitSymbol() const;
     virtual bool isBlack() { return (int)suit % 2 == 1; }
 
-    virtual void PrintCard() const;
-    virtual void PrintCardShort() const;
+    virtual std::string PrintCard() const;
+    virtual std::string PrintCardShort() const;
 
     static const std::string suit_name(Suit);
 

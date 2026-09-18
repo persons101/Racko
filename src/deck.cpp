@@ -55,7 +55,7 @@ void Deck::AddJokersToDeck(int numJokers){
     numCards += numJokers;
 }
 
-Card* Deck::GetTopCard() {
+Card* Deck::PopTopCard() {
     if (deck.size() == 0)
         return nullptr;
 
@@ -66,13 +66,31 @@ Card* Deck::GetTopCard() {
     return topCard;
 }
 
-Card* Deck::GetBottomCard() {
+Card* Deck::PopBottomCard() {
     if (deck.size() == 0)
         return nullptr;
 
     Card* bottomCard = deck.at(deck.size() - 1);
     deck.pop_back();
     numCards--;
+
+    return bottomCard;
+}
+
+Card* Deck::GetTopCard() const {
+    if (deck.size() == 0)
+        return nullptr;
+
+    Card* topCard = deck.at(0);
+
+    return topCard;
+}
+
+Card* Deck::GetBottomCard() const {
+    if (deck.size() == 0)
+        return nullptr;
+
+    Card* bottomCard = deck.at(deck.size() - 1);
 
     return bottomCard;
 }

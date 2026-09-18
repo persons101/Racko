@@ -9,3 +9,14 @@ Card* RackoPlayer::DiscardCard(int cardPos, Suit suit)
 	return discardedCard;
 }
 
+bool RackoPlayer::IsCompletedWithRack()
+{
+    bool hasProblem = false;
+
+    for (int i = 0; i < myCards.size() - 1 && !hasProblem; i++) {
+        if (!(myCards.at(i + 1) > myCards.at(i)))
+            hasProblem == true;
+    }
+
+    return !hasProblem;
+}

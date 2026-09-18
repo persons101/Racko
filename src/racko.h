@@ -15,16 +15,22 @@ private:
     int playerCnt = 0;
     int cardsInDeck = 60;
     int cardsInDiscard = 0;
+    const int RACKO_BONUS_REQ = 75;
+    const int RACKO_BONUS = 25;
 protected:
+    int racko_bonus_req_handicap = 0;
+    int racko_bonus_handicap = 0;
+
     Deck* deck;
     std::stack<Card*> discardPile;
     std::vector<Player*> playerVector;
 
     virtual int CalculateRackScore(std::vector<Card*>&) const;
 
+    int GetPlayerIdxByName(std::string playerName) const;
     virtual int PlayTurnForPlayerByIdx(int playerIdx);
     virtual int PlayTurnForPlayerByName(std::string playerName);
-    void ResetPlayers();
+    virtual void ResetPlayers();
     virtual void AddPlayer(std::string);
     virtual void AddPlayer(Player*);
 
@@ -39,8 +45,8 @@ public:
 
     Card* GetTopCardFromDeck();
     Card* GetTopCardFromDiscard();
-    std::vector<Card*> GetPlayerCardsByIdx(int playerIdx);
-    std::vector<Card*> GetPlayerCardsByName(std::string playerName);
+    std::vector<Card*> GetPlayerCardsByIdx(int playerIdx) const;
+    std::vector<Card*> GetPlayerCardsByName(std::string playerName) const;
     Player* GetPlayerByIdx(int playerIdx);
     Player* GetPlayerByName(std::string playerName);
     

@@ -42,14 +42,15 @@ std::vector<int> Player::GetCardVals() const
     return myCardVals;
 }
 
-void Player::PrintCards() const {
-    std::cout << name << "'s hand: ";
+std::string Player::PrintCards() const {
+    std::string returnVal = "";
+    returnVal += name + "'s hand: ";
 
     for (Card* card : myCards) {
-        card->PrintCardShort();
+        returnVal += card->PrintCardShort() + " ";
     }
 
-    std::cout << "\n";
+    return returnVal.substr(0, returnVal.size() - 1);
 }
 
 bool Player::DrawCard(Card* drawCard) {

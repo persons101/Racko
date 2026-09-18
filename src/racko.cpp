@@ -2,12 +2,11 @@
 
 #include <iostream>
 #include <string>
+#include "rackoPlayer.h"
 
 int Racko::CalculateRackScore(std::vector<Card *>& cards) const
 {
     int score = 0;
-    const int RACKO_BONUS_REQ = 75;
-    const int RACKO_BONUS = 25;
 
     for (int i = 0; i < cards.size() - 1; i++) {
         if (cards.at(1 + i) > cards.at(i))
@@ -16,32 +15,88 @@ int Racko::CalculateRackScore(std::vector<Card *>& cards) const
             break;
     }
 
-    if (score >= RACKO_BONUS_REQ)
-        score += RACKO_BONUS;
+    if (score >= (RACKO_BONUS_REQ + racko_bonus_req_handicap))
+        score += (RACKO_BONUS + racko_bonus_handicap);
 
     return score;
 }
 
+int Racko::GetPlayerIdxByName(std::string playerName) const
+{
+    int idx = -1;
+
+    Player* currPlayer = nullptr;
+
+    std::vector<Player*>::iterator it;
+
+    int i = 0;
+    for (i; i < playerCnt; i++) {
+        currPlayer = playerVector.at(i);
+        if (currPlayer->GetName() == playerName)
+            break;
+    }
+
+    idx = i;
+    return idx;
+}
+
 int Racko::PlayTurnForPlayerByIdx(int playerIdx)
 {
+    Player* player_raw = playerVector.at(playerIdx);
+    if (player_raw == nullptr) {
+        return -1;
+    }
 
+    RackoPlayer* player = dynamic_cast<RackoPlayer*>(player_raw);
+    if (!player) {
+        return -2;
+    }
+
+    // show cards
+    // select card to pickup
+    // pickup card
+    // select card index to replace
+    // put card in discard pile
+
+    std::string input = "";
+
+    std::cout << player->PrintCards() << "\n";
+    std::cout << "Deck (0): " << deck->GetTopCard()->PrintCardShort() << ", Discard (1): " << ((!discardPile.empty()) ? discardPile.top()->PrintCardShort() : "-") << "\n";
+    std::cout << "Choose a card: Deck='0', Discard='1'";
+    
+    // input validation
+    while (input != "0" && input != "1") {
+        std::cin >> input;
+        input = input[0];
+        if ( !(input == "0" || input == "1")) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } 
+    }
+
+    char inputChar = input[0];
+    switch (inputChar) {
+        case '0':
+            // draw from deck
+        case '1':
+            // draw from discard
+        default:
+            // should never run
+    }
+
+    int score = CalculateRackScore(player->GetCards());
+    if (player->IsCompletedWithRack()) {
+        return score;
+    }
+    
+    return 0;
 }
 
 int Racko::PlayTurnForPlayerByName(std::string playerName)
 {
-    std::vector<Player*>::iterator it = playerVector.begin();
-    int i = 0;
-    while (it != playerVector.end() && (*it)->GetName() != playerName) {
-        i++;
-        it++;
-    }
+    int idx = GetPlayerIdxByName(playerName);
 
-    if (it == playerVector.end()) {
-        std::cerr << ">>> Error: Player name not found.";
-        return -1;
-    }
-
-    PlayTurnForPlayerByIdx(i);
+    PlayTurnForPlayerByIdx(idx);
     return 0;
 }
 
@@ -53,9 +108,17 @@ void Racko::ResetPlayers()
     playerVector = {};
 }
 
+void Racko::AddPlayer(std::string playerName)
+{
+    Player* newPlayer = new RackoPlayer(playerName);
+    playerVector.push_back(newPlayer);
+    playerCnt++;
+}
+
 void Racko::AddPlayer(Player * newPlayer)
 {
     playerVector.push_back(newPlayer);
+    playerCnt++;
 }
 
 Racko::Racko()
@@ -95,16 +158,43 @@ int Racko::GetDiscardCardCount() const
     return discardPile.size();
 }
 
+std::vector<Card *> Racko::GetPlayerCardsByIdx(int playerIdx) const
+{
+    Player* player = playerVector.at(playerIdx);
+    if (player == nullptr) {
+        return std::vector<Card*>();
+    }
+
+    std::vector<Card *> cards = player->GetCards();
+    return cards;
+}
+
+std::vector<Card *> Racko::GetPlayerCardsByName(std::string playerName) const
+{
+    int idx = GetPlayerIdxByName(playerName);
+
+    if (idx == -1) {
+        return std::vector<Card *>();
+    }
+
+    Player* player = playerVector.at(idx);
+
+    return player->GetCards();
+}
+
 void Racko::PlayTurn()
 {
     bool isRoundOver = false;
     for (int i = 0; i < playerVector.size() && !isRoundOver; i++) {
+        // score is returned for possible subclasses/accessors, but value is not used in this implementation.
         int playerScore = 0;
-        playerScore = PlayTurnForPlayerByIdx(i);
+        playerScore = PlayTurnForPlayerByIdx(i); 
 
         if (playerScore != 0) {
             isRoundOver = true;
-            // TODO SCORE ALL PLAYERS
+            for (int j = 0; j < playerVector.size(); j++) {
+                ScoreRackByIdx(j);
+            }
         }
     }
 }
@@ -138,7 +228,7 @@ int Racko::FinishGame()
             }
         }
 
-        if (pLast->GetScore() > currPlayerScore || pLast == nullptr) {
+        if ( pLast == nullptr || pLast->GetScore() > currPlayerScore) {
             pLast = player;
         }
     }

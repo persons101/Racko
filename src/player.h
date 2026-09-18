@@ -25,7 +25,7 @@ public:
     
     virtual std::vector<Card*> GetCards() const;
     std::vector<int> GetCardVals() const;
-    virtual void PrintCards() const;
+    virtual std::string PrintCards() const;
     bool DrawCard(Card*);
     virtual Card* DiscardCard(int, Suit);
     Card* DiscardRandomCard();
