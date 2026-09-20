@@ -2,13 +2,14 @@
 
 #include <iostream>
 #include <string>
+#include <limits>
 #include "rackoPlayer.h"
 
-int Racko::CalculateRackScore(std::vector<Card *>& cards) const
+int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
 {
     int score = 0;
 
-    for (int i = 0; i < cards.size() - 1; i++) {
+    for (std::size_t i = 0; i < cards.size() - 1; i++) {
         if (cards.at(1 + i) > cards.at(i))
             score += 5;
         else 
@@ -80,6 +81,7 @@ int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
                 discardPile.pop();
             default:
                 // should never run
+                throw std::out_of_range("Switch-case failure");
         }
         if (card == nullptr) {
             throw std::out_of_range("No card found in stack!");

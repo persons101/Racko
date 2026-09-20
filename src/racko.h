@@ -25,7 +25,7 @@ protected:
     std::stack<Card*> discardPile;
     std::vector<Player*> playerVector;
 
-    virtual int CalculateRackScore(std::vector<Card*>&) const;
+    virtual int CalculateRackScore(const std::vector<Card*>&) const;
     virtual char SelectDrawCard(int playerIdx) const;
     virtual char SelectDrawCard(Player*) const;
     virtual int DrawCard(int playerIdx, bool);
