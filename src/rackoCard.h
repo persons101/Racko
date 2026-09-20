@@ -8,8 +8,8 @@ public:
     RackoCard(int cardVal);
     RackoCard(Card card);
     virtual std::string getSuitSymbol() const override;
-    virtual void PrintCard() const override;
-    virtual void PrintCardShort() const override;
+    virtual std::string PrintCard() const override;
+    virtual std::string PrintCardShort() const override;
 };
 
 #endif
