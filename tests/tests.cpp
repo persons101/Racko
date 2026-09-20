@@ -2,6 +2,8 @@
 #include "catch_amalgamated.hpp"
 
 #include <iostream>
+#include <sstream>
+#include <string>
 #include "../src/card.h"
 #include "../src/Deck.h"
 #include "../src/racko.h"
@@ -198,4 +200,128 @@ TEST_CASE_METHOD(Racko, "Racko game score calculation", "[Racko][RackoCard][Scor
 
 }
 
-TEST_CASE_METHOD(Racko, "")
+
+//  Racko::SelectDrawCard() -> 
+//  - test when discardPile is empty
+//  - check newest card drawn is correct card
+//  - test garbage characters
+//  - test long strings
+//  = test expected behaviors
+
+TEST_CASE_METHOD(Racko, "SelectDrawCard returns error for invalid player",
+                 "[Racko][SelectDrawCard]") {
+    REQUIRE(SelectDrawCard(-1) == 'e');
+}
+
+TEST_CASE_METHOD(Racko, "SelectDrawCard chooses the deck",
+                 "[Racko][SelectDrawCard]") {
+    AddPlayer("Steve");
+
+    std::istringstream input("0\n");
+    std::ostringstream output;
+
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    char result = SelectDrawCard(0);
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(result == 'r');
+    REQUIRE(output.str().find("Choose a card") != std::string::npos);
+}
+
+TEST_CASE_METHOD(Racko, "SelectDrawCard chooses the discard pile",
+                 "[Racko][SelectDrawCard]") {
+    AddPlayer("Steve");
+    discardPile.push(new Card(42, Suit::HEARTS));
+
+    std::istringstream input("1\n");
+    std::ostringstream output;
+
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    char result = SelectDrawCard(0);
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(result == 'i');
+    REQUIRE(output.str().find("Discard") != std::string::npos);
+}
+
+TEST_CASE_METHOD(Racko, "SelectDrawCard rejects invalid input before deck choice",
+                 "[Racko][SelectDrawCard]") {
+    AddPlayer("Steve");
+
+    std::istringstream input("x\n0\n");
+    std::ostringstream output;
+
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    char result = SelectDrawCard(0);
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(result == 'r');
+}
+
+TEST_CASE_METHOD(Racko, "SelectDrawCard rejects discard choice when pile is empty",
+                 "[Racko][SelectDrawCard]") {
+    AddPlayer("Steve");
+
+    std::istringstream input("1\n0\n");
+    std::ostringstream output;
+
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    char result = SelectDrawCard(0);
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(result == 'r');
+}
+
+TEST_CASE_METHOD(Racko, "SelectDrawCard accepts discard choice when pile is not empty",
+                 "[Racko][SelectDrawCard]") {
+    AddPlayer("Steve");
+    discardPile.push(new Card(25, Suit::CLUBS));
+
+    std::istringstream input("1\n");
+    std::ostringstream output;
+
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    char result = SelectDrawCard(0);
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(result == 'i');
+    REQUIRE(output.str().find("25") != std::string::npos);
+}
+
+TEST_CASE_METHOD(Racko, "SelectDrawCard rejects multi-character choices",
+                 "[Racko][SelectDrawCard]") {
+    AddPlayer("Steve");
+
+    std::istringstream input("10\n0\n");
+    std::ostringstream output;
+
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    char result = SelectDrawCard(0);
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(result == 'r');
+}

@@ -39,9 +39,10 @@ char Racko::SelectDrawCard(int playerIdx) const
     // input validation
     while (input != "0" && input != "1") {
         std::cin >> input;
-        input = input[0];
-
-        if (discardPile.empty() && input == "1"){
+        if (input.size() > 1) {
+            input = "-";
+        }
+        else if (discardPile.empty() && input == "1"){
             input = "-";
         }
 
