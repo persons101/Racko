@@ -26,6 +26,10 @@ protected:
     std::vector<Player*> playerVector;
 
     virtual int CalculateRackScore(std::vector<Card*>&) const;
+    virtual char SelectDrawCard(int playerIdx) const;
+    virtual char SelectDrawCard(Player*) const;
+    virtual int DrawCard(int playerIdx, bool);
+    virtual int DrawCard(Player*, bool);
 
     int GetPlayerIdxByName(std::string playerName) const;
     virtual int PlayTurnForPlayerByIdx(int playerIdx);

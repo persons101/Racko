@@ -21,6 +21,79 @@ int Racko::CalculateRackScore(std::vector<Card *>& cards) const
     return score;
 }
 
+char Racko::SelectDrawCard(int playerIdx) const
+{
+    /// Shows the player at @param{playerIdx} the top of the draw and discard piles
+    /// @return D'r'aw pile, D'i'scard, or 'e'rror
+    Player* player = playerVector.at(playerIdx);
+    if (player == nullptr) {
+        return 'e';
+    }
+
+    std::string input = "";
+
+    std::cout << player->PrintCards() << "\n";
+    std::cout << "Deck (0): " << deck->GetTopCard()->PrintCardShort() << ", Discard (1): " << ((!discardPile.empty()) ? discardPile.top()->PrintCardShort() : "-") << "\n";
+    std::cout << "Choose a card: Deck='0', Discard='1'";
+    
+    // input validation
+    while (input != "0" && input != "1") {
+        std::cin >> input;
+        input = input[0];
+
+        if (discardPile.empty() && input == "1"){
+            input = "-";
+        }
+
+        if ( !(input == "0" || input == "1")) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } 
+    }
+
+    if (input == "1") {
+        return 'i';
+    } 
+
+    return 'r';
+}
+
+int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
+{
+    Player* player = GetPlayerByIdx(playerIdx);
+
+    if (player == nullptr){
+        return -1;
+    }
+
+    Card* card = nullptr;
+    try {
+        switch (isDiscardPileChosen) {
+            case false:
+                // draw from deck
+                card = deck->PopTopCard();
+            case true:
+                // draw from discard
+                // TODO create discardPile.h/.cpp to handle stack manipulation
+                card = discardPile.top();
+                discardPile.pop();
+            default:
+                // should never run
+        }
+        if (card == nullptr) {
+            throw std::out_of_range("No card found in stack!");
+        }
+    }
+    catch (const std::out_of_range& e) {
+        std::cerr << e.what();
+        return -2;
+    }
+
+    bool playerDrawStatus = player->DrawCard(card);
+
+    return 0;
+}
+
 int Racko::GetPlayerIdxByName(std::string playerName) const
 {
     int idx = -1;
@@ -58,30 +131,22 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
     // select card index to replace
     // put card in discard pile
 
-    std::string input = "";
-
-    std::cout << player->PrintCards() << "\n";
-    std::cout << "Deck (0): " << deck->GetTopCard()->PrintCardShort() << ", Discard (1): " << ((!discardPile.empty()) ? discardPile.top()->PrintCardShort() : "-") << "\n";
-    std::cout << "Choose a card: Deck='0', Discard='1'";
+    char drawSelectionResult = SelectDrawCard(playerIdx);
     
-    // input validation
-    while (input != "0" && input != "1") {
-        std::cin >> input;
-        input = input[0];
-        if ( !(input == "0" || input == "1")) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        } 
+    bool isDiscardPileChosen;
+    switch (drawSelectionResult) {
+        case 'r':
+            isDiscardPileChosen = false;
+        case 'i':
+            isDiscardPileChosen = true;
+        default:
+            return -3;
     }
 
-    char inputChar = input[0];
-    switch (inputChar) {
-        case '0':
-            // draw from deck
-        case '1':
-            // draw from discard
-        default:
-            // should never run
+    int drawStatus = DrawCard(playerIdx, isDiscardPileChosen);
+
+    if (drawStatus != 0) {
+        return -4;
     }
 
     int score = CalculateRackScore(player->GetCards());
