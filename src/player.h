@@ -18,7 +18,9 @@ protected:
 public:
     Player(std::string);
     ~Player();
+
     std::string GetName() const;
+    int GetNumCards() const;    
 
     int GetScore() const;
     int AddScore(int);

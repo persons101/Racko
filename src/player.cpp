@@ -28,6 +28,11 @@ Player::~Player()
     }
 }
 
+int Player::GetNumCards() const
+{
+    return numCards; 
+}
+
 std::vector<Card *> Player::GetCards() const
 {
     return myCards;
