@@ -6,6 +6,9 @@ TEST_DIR = tests
 CXX ?= g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -O2 -fdiagnostics-color=always
 DEBUG = 
+COVERAGEFLAGS = -O0 --coverage
+
+.PHONY: all build buildWithCoverage tests testsWithCoverage coverage clean
 
 # Find all C++ source files
 CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -21,7 +24,6 @@ TEST_SRC_OBJECTS := $(patsubst $(TEST_DIR)/$(SRC_DIR)/%.cpp,$(TEST_DIR)/$(OBJ_DI
 TEST_OBJECTS := $(filter-out $(OBJ_DIR)/main.o,$(OBJECTS))
 TEST_OBJECTS += $(TEST_ROOT_OBJECTS) $(TEST_SRC_OBJECTS)
 
-.PHONY: all build tests clean
 
 all: build clean
 
@@ -34,8 +36,7 @@ $(OBJ_DIR):
 $(TEST_DIR)/$(OBJ_DIR):
 	mkdir -p $@
 
-# build: $(SRC_DIR)/*.cpp | bin obj
-# 	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/Racko.exe
+
 
 # Pattern rule to compile .cpp files into .o files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
@@ -50,12 +51,23 @@ $(TEST_SRC_OBJECTS): $(TEST_DIR)/$(OBJ_DIR)/%.o: $(TEST_DIR)/$(SRC_DIR)/%.cpp | 
 build: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/Racko.exe
 
+buildWithCoverage: CXXFLAGS += $(COVERAGEFLAGS)
+buildWithCoverage: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/RackoCoverage.exe
 
 tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(DEBUG) $^ -o $(BIN_DIR)/$@.exe
+	$(CXX) $(CXXFLAGS) $(DEBUG) $(TESTFLAGS) $^ -o $(BIN_DIR)/$@.exe
+	./$(BIN_DIR)/$@.exe
 
-testAndRun: build tests
-	./$(BIN_DIR)/tests.exe
+testsWithCoverage: CXXFLAGS += $(COVERAGEFLAGS)
+testsWithCoverage: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(TESTFLAGS) $^ -o $(BIN_DIR)/testsCoverage.exe
+	./$(BIN_DIR)/$@.exe
+
+coverage: clean
+	$(MAKE) buildWithCoverage
+	$(MAKE) testsWithCoverage
+	./$(BIN_DIR)/testsCoverage.exe
 
 clean:
 	rm -rf $(OBJ_DIR)/*.o
