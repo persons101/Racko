@@ -26,11 +26,21 @@ char Racko::SelectDrawCard(int playerIdx) const
 {
     /// Shows the player at @param{playerIdx} the top of the draw and discard piles
     /// @return D'r'aw pile, D'i'scard, or 'e'rror
-    Player* player = playerVector.at(playerIdx);
+    Player* player = GetPlayerByIdx(playerIdx);
     if (player == nullptr) {
         return 'e';
     }
 
+    return SelectDrawCard(player);
+}
+
+char Racko::SelectDrawCard(Player * player) const
+{
+    /// Shows the player @param{player} the top of the draw and discard piles
+    /// @return D'r'aw pile, D'i'scard, or 'e'rror
+    if (player == nullptr) {
+        return 'e';
+    }
     std::string input = "";
 
     std::cout << player->PrintCards() << "\n";
@@ -88,12 +98,17 @@ int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
         }
     }
     catch (const std::out_of_range& e) {
-        std::cerr << e.what();
+        std::cerr << e.what() << std::endl;
         return -2;
     }
 
     bool playerDrawStatus = player->DrawCard(card);
 
+    return 0;
+}
+
+int Racko::DrawCard(Player *, bool)
+{
     return 0;
 }
 
@@ -239,15 +254,33 @@ std::vector<Card *> Racko::GetPlayerCardsByIdx(int playerIdx) const
 
 std::vector<Card *> Racko::GetPlayerCardsByName(std::string playerName) const
 {
+    Player* player = GetPlayerByName(playerName);
+
+    return player->GetCards();
+}
+
+Player *Racko::GetPlayerByIdx(int playerIdx) const
+{
+    try {
+        Player* player = playerVector.at(playerIdx);
+        return player;
+    }
+    catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    return nullptr;
+}
+
+Player *Racko::GetPlayerByName(std::string playerName) const
+{
     int idx = GetPlayerIdxByName(playerName);
 
     if (idx == -1) {
-        return std::vector<Card *>();
+        return nullptr;
     }
 
-    Player* player = playerVector.at(idx);
-
-    return player->GetCards();
+    Player* player = GetPlayerByIdx(idx);
+    return player;
 }
 
 void Racko::PlayTurn()

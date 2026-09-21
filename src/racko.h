@@ -51,8 +51,8 @@ public:
     Card* GetTopCardFromDiscard();
     std::vector<Card*> GetPlayerCardsByIdx(int playerIdx) const;
     std::vector<Card*> GetPlayerCardsByName(std::string playerName) const;
-    Player* GetPlayerByIdx(int playerIdx);
-    Player* GetPlayerByName(std::string playerName);
+    Player* GetPlayerByIdx(int playerIdx) const;
+    Player* GetPlayerByName(std::string playerName) const;
     
     void ScoreRackByIdx(int playerIdx);
     void ScoreRackByName(std::string playerName);
