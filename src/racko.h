@@ -47,8 +47,8 @@ public:
     int GetDeckCardCount() const;
     int GetDiscardCardCount() const;
 
-    Card* GetTopCardFromDeck();
-    Card* GetTopCardFromDiscard();
+    Card* GetTopCardFromDeck() const;
+    Card* GetTopCardFromDiscard() const;
     std::vector<Card*> GetPlayerCardsByIdx(int playerIdx) const;
     std::vector<Card*> GetPlayerCardsByName(std::string playerName) const;
     Player* GetPlayerByIdx(int playerIdx) const;

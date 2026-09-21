@@ -143,12 +143,15 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
         return -2;
     }
 
-    // show cards
-    // select card to pickup
-    // pickup card
-    // select card index to replace
-    // put card in discard pile
+    // 1. show cards
+    // 2. select card to pickup
+    // 3. pickup card
+    // 4. select card index to replace
+    // 5. put card in discard pile
+    // 6. check if complete
+    // 7. if round over, score all players
 
+    // 1+2
     char drawSelectionResult = SelectDrawCard(playerIdx);
     
     bool isDiscardPileChosen;
@@ -161,13 +164,22 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
             return -3;
     }
 
+    // 3
     int drawStatus = DrawCard(playerIdx, isDiscardPileChosen);
 
     if (drawStatus != 0) {
         return -4;
     }
 
+    // 4
+    // TODO
+
+    // 5
+    // TODO
+
+    // 6
     int score = CalculateRackScore(player->GetCards());
+    // 7
     if (player->IsCompletedWithRack()) {
         return score;
     }
@@ -241,6 +253,32 @@ int Racko::GetDiscardCardCount() const
     return discardPile.size();
 }
 
+Card *Racko::GetTopCardFromDeck() const
+{
+    try {
+        Card* card = deck->GetTopCard();
+        return card;
+    }
+    catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return nullptr;
+}
+
+Card *Racko::GetTopCardFromDiscard() const
+{
+    try {
+        Card* card = discardPile.top();
+        return card;
+    }
+    catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return nullptr;
+}
+
 std::vector<Card *> Racko::GetPlayerCardsByIdx(int playerIdx) const
 {
     Player* player = playerVector.at(playerIdx);
@@ -281,6 +319,28 @@ Player *Racko::GetPlayerByName(std::string playerName) const
 
     Player* player = GetPlayerByIdx(idx);
     return player;
+}
+
+void Racko::ScoreRackByIdx(int playerIdx)
+{
+    Player* player = GetPlayerByIdx(playerIdx);
+    if (!player) {
+        return;
+    }
+
+    int score = CalculateRackScore(player->GetCards());
+    player->AddScore(score);
+}
+
+void Racko::ScoreRackByName(std::string playerName)
+{
+    Player* player = GetPlayerByName(playerName);
+    if (!player) {
+        return;
+    }
+
+    int score = CalculateRackScore(player->GetCards());
+    player->AddScore(score);
 }
 
 void Racko::PlayTurn()
