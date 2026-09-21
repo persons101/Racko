@@ -33,6 +33,27 @@ int Player::GetNumCards() const
     return numCards; 
 }
 
+std::vector<Card*> Player::ResetPlayer(bool returnToDeck)
+{
+    score = 0;
+    std::vector<Card*> cardsToDeck;
+    if (returnToDeck) {
+        for (std::size_t i = 0; i < myCards.size(); i++) {
+            cardsToDeck.push_back( myCards.at(i) );
+            myCards.at(i) = nullptr;
+        }
+    }
+    else {
+        for (auto card : myCards) {
+            delete card;
+        }
+    }
+    
+    myCards = {};
+
+    return cardsToDeck;
+}
+
 std::vector<Card *> Player::GetCards() const
 {
     return myCards;

@@ -9,10 +9,10 @@
 class Player {
 private:
     int score;
-    int numCards;
-
+    
 protected:
     Player();
+    int numCards;
     std::string name;
     std::vector<Card*> myCards;
 public:
@@ -24,6 +24,8 @@ public:
 
     int GetScore() const;
     int AddScore(int);
+    
+    std::vector<Card*> ResetPlayer(bool AddToDeck = false);
     
     virtual std::vector<Card*> GetCards() const;
     std::vector<int> GetCardVals() const;
