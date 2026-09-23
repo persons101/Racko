@@ -378,3 +378,71 @@ TEST_CASE_METHOD(Racko, "SelectDrawCard rejects multi-character choices",
 
     REQUIRE(result == 'r');
 }
+
+TEST_CASE("Card accessors, formatting, and comparisons", "[Card]") {
+    Card joker(0, Suit::HEARTS);
+    Card aceOfSpades(1, Suit::SPADES);
+    Card kingOfSpades(13, Suit::SPADES);
+    Card invalidValue(-1, Suit::CLUBS);
+
+    REQUIRE(joker.getValue() == 0);
+    REQUIRE(joker.getSuit() == Suit::HEARTS);
+    REQUIRE(joker.getValueString() == "Joker");
+    REQUIRE(joker.getSuitName() == "Hearts");
+    REQUIRE(joker.getSuitSymbol() == "\xe2\x99\xa5");
+    REQUIRE(joker.isBlack() == false);
+    REQUIRE(aceOfSpades.isBlack() == true);
+    REQUIRE(kingOfSpades.PrintCard() == "Card Value: 13, Suit: Spades");
+    REQUIRE(aceOfSpades.PrintCardShort() == "A\xe2\x99\xa0");
+    REQUIRE(invalidValue.getValueString() == "-1");
+
+    Card sameAce(1, Suit::SPADES);
+    Card differentAce(1, Suit::HEARTS);
+    REQUIRE(aceOfSpades == sameAce);
+    REQUIRE_FALSE(aceOfSpades != sameAce);
+    REQUIRE(aceOfSpades != differentAce);
+    REQUIRE_FALSE(aceOfSpades == differentAce);
+
+    Card::compareCards compare;
+    REQUIRE(compare(Card(1, Suit::SPADES), Card(2, Suit::SPADES)));
+    REQUIRE(compare(Card(1, Suit::SPADES), Card(1, Suit::HEARTS)));
+    REQUIRE(compare(Card(1, Suit::SPADES), std::make_tuple(2, Suit::SPADES)));
+    REQUIRE_FALSE(compare(Card(2, Suit::SPADES), Card(1, Suit::SPADES)));
+}
+
+TEST_CASE("Deck accessors, boundaries, shuffle, and output", "[Deck]") {
+    Deck deck(2, 2, 1);
+
+    REQUIRE(deck.GetNumCards() == 5);
+    REQUIRE(deck.GetCards().size() == 5);
+    REQUIRE(*deck.GetTopCard() == std::make_tuple(1, Suit::SPADES));
+    REQUIRE(*deck.GetBottomCard() == std::make_tuple(0, Suit::SPADES));
+
+    Card* topCard = deck.PopTopCard();
+    Card* bottomCard = deck.PopBottomCard();
+    REQUIRE(*topCard == std::make_tuple(1, Suit::SPADES));
+    REQUIRE(*bottomCard == std::make_tuple(0, Suit::SPADES));
+    delete topCard;
+    delete bottomCard;
+    REQUIRE(deck.GetNumCards() == 3);
+
+    auto cardsBeforeShuffle = deck.GetCards();
+    deck.Shuffle();
+    REQUIRE(deck.GetNumCards() == 3);
+    REQUIRE(deck.GetCards().size() == cardsBeforeShuffle.size());
+
+    std::ostringstream output;
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+    deck.PrintDeck();
+    std::cout.rdbuf(oldOutput);
+    REQUIRE(output.str().find("---Start Deck---") != std::string::npos);
+    REQUIRE(output.str().find("--- End Deck ---") != std::string::npos);
+
+    Deck emptyDeck(0, 0);
+    REQUIRE(emptyDeck.GetNumCards() == 0);
+    REQUIRE(emptyDeck.GetCards().empty());
+    REQUIRE(emptyDeck.GetTopCard() == nullptr);
+    REQUIRE(emptyDeck.GetBottomCard() == nullptr);
+    REQUIRE(emptyDeck.PopTopCard() == nullptr);
+    REQUIRE(emptyDeck.PopBottomCard() == nullptr);
+}
