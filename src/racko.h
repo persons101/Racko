@@ -24,6 +24,7 @@ protected:
         Hard,
         Custom
     };
+    Difficulty current_difficulty = Difficulty::Medium;
     int custom_difficulty_goal_score = -1;
 
     int racko_bonus_req_handicap = 0;
@@ -47,9 +48,10 @@ protected:
     virtual void AddPlayer(std::string);
     virtual void AddPlayer(Player*);
 
-    virtual void SetScoreGoal();
-    virtual void SetDifficulty();
-    virtual void SetCustomGoal(); 
+    virtual void SetScoreGoal(int);
+    virtual void SetScoreGoal(Difficulty);
+    virtual void SetDifficulty(Difficulty);
+    virtual void SetCustomGoal(int); 
 public:
     Racko();
 
@@ -70,6 +72,7 @@ public:
     
     virtual void SetupGame();
     virtual Player* CreatePlayer();
+    virtual void ChooseDifficulty();
     virtual void PlayTurn();
     virtual int FinishGame();
     virtual void ResetGame();
