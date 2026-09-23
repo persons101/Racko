@@ -74,4 +74,4 @@ Racko,PlayTurn,void,false,true,,,,,,,,,,,,,,,,High,Missing,"src/racko.h","-","No
 Racko,FinishGame,int,false,true,,,,,,,,,,,,,,,,High,Missing,"src/racko.h","-","No direct test"
 Racko,ResetGame,void,false,true,,,,,,,,,,,,,,,,Medium,Missing,"src/racko.h","-","No direct test"
 TestPlayer,GetTestCardVals,std::set<int>,false,false,,,,,,,,,,,,,,,,Medium,Partial,"tests/src/testPlayer.h","TestPlayer functions","Used to build custom deck"
-TestDeck,TestDeck,void,false,false,,,,,,,,,,,,,,,,Medium,Partial,"tests/src/testDeck.h","One player turn","Used in turn behavior tests"
+TestDeck,TestDeck,void,false,false,,,,,,,,,,,,,,,,Medium,Partial,"tests/src/testDeck.h","One player turn","Used in turn behavior tests" 

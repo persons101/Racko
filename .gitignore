@@ -3,3 +3,4 @@ bin/*
 tests/obj/*
 .vs/
 src/.playerWSet.*
+tests/RackoMethodTestStatus.xlsx
