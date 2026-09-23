@@ -30,8 +30,7 @@ protected:
     virtual char SelectDrawCard(Player*) const;
     virtual int DrawCard(int playerIdx, bool);
     virtual int DrawCard(Player*, bool);
-    virtual int DiscardCard(Card*);
-
+    virtual int AddCardToDiscard(Card*);
     int GetPlayerIdxByName(std::string playerName) const;
     virtual int PlayTurnForPlayerByIdx(int playerIdx);
     virtual int PlayTurnForPlayerByName(std::string playerName);
@@ -47,7 +46,7 @@ public:
     int GetPlayerCount() const;
     int GetDeckCardCount() const;
     int GetDiscardCardCount() const;
-
+    
     Card* GetTopCardFromDeck() const;
     Card* GetTopCardFromDiscard() const;
     std::vector<Card*> GetPlayerCardsByIdx(int playerIdx) const;

@@ -78,17 +78,28 @@ int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
         return -1;
     }
 
+    return DrawCard(player, isDiscardPileChosen);
+}
+
+int Racko::DrawCard(Player * player, bool isDiscardPileChosen)
+{
+    if (player == nullptr){
+        return -1;
+    }
+
     Card* card = nullptr;
     try {
         switch (isDiscardPileChosen) {
             case false:
                 // draw from deck
                 card = deck->PopTopCard();
+                cardsInDeck--;
             case true:
                 // draw from discard
                 // TODO create discardPile.h/.cpp to handle stack manipulation
                 card = discardPile.top();
                 discardPile.pop();
+                cardsInDiscard--;
             default:
                 // should never run
                 throw std::out_of_range("Switch-case failure");
@@ -107,9 +118,11 @@ int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
     return 0;
 }
 
-int Racko::DrawCard(Player *, bool)
+int Racko::AddCardToDiscard(Card * cardToAdd)
 {
-    return 0;
+    discardPile.push(cardToAdd);
+    cardsInDiscard++;
+    return cardsInDiscard;
 }
 
 int Racko::GetPlayerIdxByName(std::string playerName) const
