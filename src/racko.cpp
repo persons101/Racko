@@ -4,6 +4,7 @@
 #include <string>
 #include <limits>
 #include "rackoPlayer.h"
+#include "rackoDeck.h"
 
 int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
 {
@@ -103,6 +104,10 @@ int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
     }
 
     bool playerDrawStatus = player->DrawCard(card);
+
+    if (!playerDrawStatus) {
+        return -3;
+    }
 
     return 0;
 }
@@ -341,6 +346,40 @@ void Racko::ScoreRackByName(std::string playerName)
 
     int score = CalculateRackScore(player->GetCards());
     player->AddScore(score);
+}
+
+void Racko::SetupGame()
+{
+    deck = new RackoDeck();
+    std::string inputString = "";
+    int numPlayersToAdd = 0;
+    
+    do {
+        try {
+            std::cout << "Enter number of players: ";
+            std::cin >> inputString;
+
+            numPlayersToAdd = std::stoi(inputString);
+        }
+        catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } 
+        catch (const std::out_of_range& e) {
+            std::cerr << "Out of range: The value is too large or too small for an int." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    } while (numPlayersToAdd <= 0);
+
+    for (std::size_t i; i < numPlayersToAdd; i++) {
+        Player* player = CreatePlayer();
+        AddPlayer(player);
+    }
+
+    SetDifficulty();
+    SetScoreGoal();
 }
 
 void Racko::PlayTurn()
