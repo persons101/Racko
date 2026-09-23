@@ -36,7 +36,7 @@ char Card::getValueChar() const {
 
 std::string Card::getValueString() const {
     switch (value) {
-        case 0: return "X";
+        case 0: return "Joker";
         case 1: return "A";
         case 10: return "T";
         case 11: return "J";
