@@ -29,6 +29,59 @@ TEST_CASE("Testing Suit to int", "[Suit]"){
     REQUIRE(static_cast<int>(Suit::CLUBS) == 4);
 }
 
+TEST_CASE("Card methods", "[Card]") {
+    std::vector<Card*> cards;
+    Card* cardJokerHeart = new Card(0, Suit::HEARTS);
+    REQUIRE(cardJokerHeart);
+    cards.push_back(cardJokerHeart);
+    Card* aceOfSpades = new Card(1, Suit::SPADES);
+    REQUIRE(aceOfSpades);
+    cards.push_back(aceOfSpades);
+    for (int i = 2; i <= 10; i++) {
+        cards.push_back(new Card(i, Suit(i % 4)));
+    }
+    Card* eightOfClubs = cards.at(8);
+    REQUIRE(eightOfClubs->getSuit() == Suit::CLUBS);
+    REQUIRE(eightOfClubs->getValue() == 8);
+
+    std::tuple<int, Suit> cardTuple = std::tuple(11, Suit::DIAMONDS);
+    Card* jackOfDiamonds = new Card(cardTuple);
+    REQUIRE(jackOfDiamonds);
+    for (int i = 12; i <= 14; i++) {
+        cards.push_back(new Card(i, Suit::DIAMONDS));
+    }
+
+    for (std::size_t i = 0; cards.size(); i++) {
+        REQUIRE(cards.at(i)->getValue() == i);
+    }
+
+    SECTION("Card methods - getValueChar", "[Card::getValueChar]") {
+        REQUIRE(cards.at(0)->getValueChar() == 'X');
+        REQUIRE(aceOfSpades->getValueChar() == 'A');
+        REQUIRE(cards.at(5)->getValueChar() == '5');
+        REQUIRE(jackOfDiamonds->getValueChar() == 'J');
+        REQUIRE(cards.at(12)->getValueChar() == 'Q');
+        REQUIRE(cards.at(13)->getValueChar() == 'K');
+        REQUIRE(cards.at(14)->getValueChar() == '^');
+        REQUIRE(Card(-1,Suit::CLUBS).getValueChar() == '_');
+    }
+
+    SECTION("Card methods - getSuit[name]", "[Card::getSuit][Card::getSuitName]") {
+        REQUIRE(cardJokerHeart->getSuit() == Suit::HEARTS);
+        REQUIRE(cardJokerHeart->getSuitName() == "Hearts");
+        REQUIRE(cardJokerHeart->getSuitSymbol() == "\xe2\x99\xA5");
+        REQUIRE(aceOfSpades->getSuit() == Suit::SPADES);
+        REQUIRE(aceOfSpades->getSuitName() == "Spades"); 
+        REQUIRE(aceOfSpades->getSuitSymbol() == "\xe2\x99\xA0");
+        REQUIRE(eightOfClubs->getSuit() == Suit::CLUBS);
+        REQUIRE(eightOfClubs->getSuitName() == "Clubs");
+        REQUIRE(aceOfSpades->getSuitSymbol() == "\xe2\x99\xA3");
+        REQUIRE(jackOfDiamonds->getSuit() == Suit::DIAMONDS);
+        REQUIRE(jackOfDiamonds->getSuitName() == "Diamonds"); 
+        REQUIRE(aceOfSpades->getSuitSymbol() == "\xe2\x99\xA6");
+    }
+}
+
 TEST_CASE("Game class creation", "[Game],[constructor]"){
     Racko game;
 }
