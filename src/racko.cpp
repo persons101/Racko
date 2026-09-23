@@ -4,6 +4,7 @@
 #include <string>
 #include <limits>
 #include "rackoPlayer.h"
+#include "rackoDeck.h"
 
 int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
 {
@@ -103,6 +104,10 @@ int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
     }
 
     bool playerDrawStatus = player->DrawCard(card);
+
+    if (!playerDrawStatus) {
+        return -3;
+    }
 
     return 0;
 }
@@ -214,6 +219,35 @@ void Racko::AddPlayer(Player * newPlayer)
 {
     playerVector.push_back(newPlayer);
     playerCnt++;
+}
+
+void Racko::SetScoreGoal(int goal)
+{
+    score_goal = goal;
+}
+
+void Racko::SetScoreGoal(Difficulty difficulty)
+{
+    switch (difficulty) {
+        case Difficulty::Easy:
+            SetScoreGoal(100);
+        case Difficulty::Medium:
+            SetScoreGoal(150);
+        case Difficulty::Hard:
+            SetScoreGoal(200);
+        case Difficulty::Custom:
+            SetScoreGoal(custom_difficulty_goal_score);
+    }
+}
+
+void Racko::SetDifficulty(Difficulty difficulty)
+{
+    current_difficulty = difficulty;
+}
+
+void Racko::SetCustomGoal(int goal)
+{
+    custom_difficulty_goal_score = goal;
 }
 
 Racko::Racko()
@@ -341,6 +375,107 @@ void Racko::ScoreRackByName(std::string playerName)
 
     int score = CalculateRackScore(player->GetCards());
     player->AddScore(score);
+}
+
+void Racko::SetupGame()
+{
+    deck = new RackoDeck();
+    std::string inputString = "";
+    int numPlayersToAdd = 0;
+    
+    do {
+        try {
+            std::cout << "Enter number of players: ";
+            std::cin >> inputString;
+
+            numPlayersToAdd = std::stoi(inputString);
+        }
+        catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } 
+        catch (const std::out_of_range& e) {
+            std::cerr << "Out of range: The value is too large or too small for an int." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    } while (numPlayersToAdd <= 0);
+
+    for (std::size_t i; i < numPlayersToAdd; i++) {
+        Player* player = CreatePlayer();
+        AddPlayer(player);
+    }
+
+    ChooseDifficulty();
+}
+
+Player *Racko::CreatePlayer()
+{
+    return nullptr;
+}
+
+void Racko::ChooseDifficulty()
+{
+    Difficulty difficulty;
+    std::string inputString;
+    int inputSetting;
+    std::cout << "Please choose a difficulty: (1)Easy, (2)Medium, (3)Hard, (4)Custom\n";
+    do {
+        try {
+            std::cin >> inputString;
+
+            inputSetting = std::stoi(inputString);
+        }
+        catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } 
+        catch (const std::out_of_range& e) {
+            std::cerr << "Out of range: The value is too large or too small for an int." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    } while (inputSetting <= 0 || inputSetting > 4);
+
+    switch (inputSetting) {
+        case 1:
+            difficulty = Difficulty::Easy;
+        case 2:
+            difficulty = Difficulty::Medium;
+        case 3:
+            difficulty = Difficulty::Hard;
+        case 4:
+            difficulty = Difficulty::Custom;
+            std::cout << "Custom difficulty selected. Set a point goal: ";
+            do {
+                try {
+                    std::cin >> inputString;
+
+                    inputSetting = std::stoi(inputString);
+                    if (inputSetting < 1) {
+                        throw std::out_of_range("Out of range: value must be a positive, non-zero integer. ");
+                    }
+                }
+                catch (const std::invalid_argument& e) {
+                    std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                } 
+                catch (const std::out_of_range& e) {
+                    std::cerr << e.what() << std::endl;
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
+            } while (inputSetting <= 0 || inputSetting > 4);
+
+            SetCustomGoal(inputSetting);
+        default: 
+            difficulty = Difficulty::Medium;
+    }
+
+    SetDifficulty(difficulty);
 }
 
 void Racko::PlayTurn()
