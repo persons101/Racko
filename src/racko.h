@@ -30,6 +30,7 @@ protected:
     virtual char SelectDrawCard(Player*) const;
     virtual int DrawCard(int playerIdx, bool);
     virtual int DrawCard(Player*, bool);
+    virtual int DiscardCard(Card*);
 
     int GetPlayerIdxByName(std::string playerName) const;
     virtual int PlayTurnForPlayerByIdx(int playerIdx);
