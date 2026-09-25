@@ -26,6 +26,9 @@ protected:
     };
     Difficulty current_difficulty = Difficulty::Medium;
     int custom_difficulty_goal_score = -1;
+    int GetTestScoreGoal() const { return score_goal; }
+    int GetTestCustomGoal() const { return custom_difficulty_goal_score; }
+    int GetTestDifficulty() const { return static_cast<int>(current_difficulty); }
 
     int racko_bonus_req_handicap = 0;
     int racko_bonus_handicap = 0;

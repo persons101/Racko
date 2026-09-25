@@ -9,6 +9,7 @@ class TestPlayer : public RackoPlayer {
 protected:
     void SetCards();
 public:
+    using RackoPlayer::center;
     TestPlayer();
     TestPlayer(std::string);
     std::set<int> static GetTestCardVals();

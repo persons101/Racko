@@ -13,7 +13,14 @@
 #include "src/testDeck.h"
 #include "src/testPlayer.h"
 
-
+class DifficultyTestRacko : public Racko {
+public:
+    using Difficulty = Racko::Difficulty;
+    using Racko::ChooseDifficulty;
+    using Racko::SetCustomGoal;
+    using Racko::SetDifficulty;
+    using Racko::SetScoreGoal;
+};
 
 TEST_CASE("Testing Suit to string", "[Suit],[suit_name]"){
     REQUIRE(Card::suit_name(Suit::SPADES) == "Spades");
@@ -446,3 +453,200 @@ TEST_CASE("Deck accessors, boundaries, shuffle, and output", "[Deck]") {
     REQUIRE(emptyDeck.PopTopCard() == nullptr);
     REQUIRE(emptyDeck.PopBottomCard() == nullptr);
 }
+
+TEST_CASE_METHOD(DifficultyTestRacko, "Racko difficulty and score goal settings",
+                 "[Racko][Difficulty][ScoreGoal]") {
+    SECTION("Direct score goals include boundaries and negative values") {
+        SetScoreGoal(0);
+        REQUIRE(GetTestScoreGoal() == 0);
+
+        SetScoreGoal(150);
+        REQUIRE(GetTestScoreGoal() == 150);
+
+        SetScoreGoal(-1);
+        REQUIRE(GetTestScoreGoal() == -1);
+    }
+
+    SECTION("Difficulty state and custom goal are stored") {
+        SetCustomGoal(1);
+        REQUIRE(GetTestCustomGoal() == 1);
+        SetDifficulty(Difficulty::Easy);
+        REQUIRE(GetTestDifficulty() == 0);
+        SetDifficulty(Difficulty::Custom);
+        REQUIRE(GetTestDifficulty() == 3);
+    }
+
+    SECTION("Preset difficulties select their documented score goals") {
+        SetScoreGoal(Difficulty::Easy);
+        REQUIRE(GetTestScoreGoal() == 100);
+
+        SetScoreGoal(Difficulty::Medium);
+        REQUIRE(GetTestScoreGoal() == 150);
+
+        SetScoreGoal(Difficulty::Hard);
+        REQUIRE(GetTestScoreGoal() == 200);
+
+        SetCustomGoal(75);
+        SetScoreGoal(Difficulty::Custom);
+        REQUIRE(GetTestScoreGoal() == 75);
+    }
+}
+
+TEST_CASE_METHOD(DifficultyTestRacko, "Racko difficulty selection handles invalid input",
+                 "[Racko][Difficulty][ScoreGoal]") {
+    std::istringstream input("x\n0\n2\n");
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+
+    ChooseDifficulty();
+
+    std::cin.rdbuf(oldInput);
+    REQUIRE(GetTestDifficulty() == 1);
+    REQUIRE(GetTestScoreGoal() == 150);
+}
+
+TEST_CASE("RackoPlayer construction and center formatting", "[RackoPlayer]") {
+    TestPlayer player("Alex");
+    TestPlayer emptyName("");
+
+    REQUIRE(player.GetName() == "Alex");
+    REQUIRE(emptyName.GetName().empty());
+    REQUIRE(player.GetNumCards() == 15);
+    REQUIRE(emptyName.GetNumCards() == 15);
+    REQUIRE(player.GetScore() == 0);
+
+    REQUIRE(player.center("x", 5) == "  x  ");
+    REQUIRE(player.center("x", 4, '.') == "...x");
+    REQUIRE(player.center("text", 4) == "text");
+    REQUIRE(player.center("long text", 4) == "long text");
+}
+
+TEST_CASE("RackoPlayer displays rack values and positions", "[RackoPlayer]") {
+    TestPlayer player("Alex");
+    player.ResetPlayer();
+
+    REQUIRE(player.DisplayCardsInRack() == "\n");
+
+    player.DrawCard(new Card(1, Suit::SPADES));
+    player.DrawCard(new Card(10, Suit::HEARTS));
+    player.DrawCard(new Card(13, Suit::CLUBS));
+
+    const std::string display = player.DisplayCardsInRack();
+    REQUIRE(display.find(" 1  ") != std::string::npos);
+    REQUIRE(display.find(" 10 ") != std::string::npos);
+    REQUIRE(display.find(" 13 ") != std::string::npos);
+    REQUIRE(display.find(" 0  ") != std::string::npos);
+    REQUIRE(display.find(" 5  ") != std::string::npos);
+    REQUIRE(display.find("10 ") != std::string::npos);
+    REQUIRE(display.find('\n') != std::string::npos);
+}
+
+TEST_CASE("RackoPlayer completion checks rack ordering", "[RackoPlayer]") {
+    TestPlayer oneCardPlayer("One");
+    oneCardPlayer.ResetPlayer();
+    oneCardPlayer.DrawCard(new Card(7, Suit::SPADES));
+    REQUIRE(oneCardPlayer.IsCompletedWithRack());
+
+    TestPlayer increasingPlayer("Increasing");
+    increasingPlayer.ResetPlayer();
+    increasingPlayer.DrawCard(new Card(1, Suit::SPADES));
+    increasingPlayer.DrawCard(new Card(2, Suit::SPADES));
+    increasingPlayer.DrawCard(new Card(9, Suit::SPADES));
+    REQUIRE(increasingPlayer.IsCompletedWithRack());
+
+    TestPlayer duplicatePlayer("Duplicate");
+    duplicatePlayer.ResetPlayer();
+    duplicatePlayer.DrawCard(new Card(1, Suit::SPADES));
+    duplicatePlayer.DrawCard(new Card(1, Suit::HEARTS));
+    REQUIRE_FALSE(duplicatePlayer.IsCompletedWithRack());
+
+    TestPlayer descendingPlayer("Descending");
+    descendingPlayer.ResetPlayer();
+    descendingPlayer.DrawCard(new Card(9, Suit::SPADES));
+    descendingPlayer.DrawCard(new Card(2, Suit::SPADES));
+    REQUIRE_FALSE(descendingPlayer.IsCompletedWithRack());
+}
+
+TEST_CASE("RackoPlayer replaces cards at valid and invalid positions", "[RackoPlayer]") {
+    TestPlayer player("Alex");
+    player.ResetPlayer();
+    player.DrawCard(new Card(1, Suit::SPADES));
+    player.DrawCard(new Card(2, Suit::HEARTS));
+    player.DrawCard(new Card(3, Suit::CLUBS));
+
+    Card* oldFirst = player.ReplaceCard(new Card(10, Suit::DIAMONDS), 0);
+    REQUIRE(oldFirst != nullptr);
+    REQUIRE(oldFirst->getValue() == 1);
+    delete oldFirst;
+    REQUIRE(player.GetCards().at(0)->getValue() == 10);
+
+    Card* oldLast = player.ReplaceCard(new Card(20, Suit::DIAMONDS), 2);
+    REQUIRE(oldLast != nullptr);
+    REQUIRE(oldLast->getValue() == 3);
+    delete oldLast;
+    REQUIRE(player.GetCards().at(2)->getValue() == 20);
+
+    const std::vector<int> valuesBeforeInvalid = player.GetCardVals();
+    REQUIRE(player.ReplaceCard(nullptr, 1) == nullptr);
+    Card* negativePositionCard = new Card(30, Suit::DIAMONDS);
+    Card* outOfBoundsCard = new Card(30, Suit::DIAMONDS);
+    REQUIRE(player.ReplaceCard(negativePositionCard, -1) == nullptr);
+    REQUIRE(player.ReplaceCard(outOfBoundsCard, 3) == nullptr);
+    delete negativePositionCard;
+    delete outOfBoundsCard;
+    REQUIRE(player.GetCardVals() == valuesBeforeInvalid);
+}
+
+TEST_CASE("RackoPlayer discards valid and invalid positions", "[RackoPlayer]") {
+    TestPlayer player("Alex");
+    player.ResetPlayer();
+    player.DrawCard(new Card(1, Suit::SPADES));
+    player.DrawCard(new Card(2, Suit::HEARTS));
+    player.DrawCard(new Card(3, Suit::CLUBS));
+
+    Card* first = player.DiscardCard(0);
+    REQUIRE(first != nullptr);
+    REQUIRE(first->getValue() == 1);
+    delete first;
+    REQUIRE(player.GetNumCards() == 2);
+
+    Card* last = player.DiscardCard(1, Suit::DIAMONDS);
+    REQUIRE(last != nullptr);
+    REQUIRE(last->getValue() == 3);
+    delete last;
+    REQUIRE(player.GetNumCards() == 1);
+
+    REQUIRE(player.DiscardCard(-1) == nullptr);
+    REQUIRE(player.DiscardCard(1) == nullptr);
+    REQUIRE(player.GetNumCards() == 1);
+}
+
+TEST_CASE("RackoPlayer selects a replacement card after invalid input", "[RackoPlayer]") {
+    TestPlayer player("Alex");
+    player.ResetPlayer();
+    player.DrawCard(new Card(1, Suit::SPADES));
+    player.DrawCard(new Card(10, Suit::HEARTS));
+    player.DrawCard(new Card(15, Suit::CLUBS));
+
+    std::istringstream input("x\n0\n999999999999999999999\n15\n");
+    std::ostringstream output;
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    const int selected = player.SelectCardToReplace(nullptr);
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(selected == 2);
+    REQUIRE(output.str().find("Choose a card to remove") != std::string::npos);
+}
+
+TEST_CASE_METHOD(TestPlayer, "RackoPlayer centers text numbers", "[RackoPlayer][center]") {
+    std::string twoChar = "ab";
+    std::string threeChar = "abc";
+    std::string fourChar = "abcd";
+    REQUIRE(center(twoChar, 4) == " ab ");
+    REQUIRE(center(threeChar, 4) == " abc");
+    REQUIRE(center(fourChar, 4) == "abcd");
+}
+
