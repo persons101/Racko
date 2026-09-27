@@ -641,6 +641,92 @@ TEST_CASE("RackoPlayer selects a replacement card after invalid input", "[RackoP
     REQUIRE(output.str().find("Choose a card to remove") != std::string::npos);
 }
 
+TEST_CASE("Player reset and ordered value access", "[Player][ResetPlayer][GetCardVals][PrintCards]") {
+    Player player("Steve");
+
+    REQUIRE(player.GetCardVals().empty());
+    REQUIRE(player.PrintCards() == "Steve's hand:");
+
+    player.DrawCard(new Card(7, Suit::HEARTS));
+    player.DrawCard(new Card(3, Suit::CLUBS));
+    player.DrawCard(new Card(9, Suit::SPADES));
+
+    REQUIRE(player.GetCardVals() == std::vector<int>({7, 3, 9}));
+    REQUIRE(player.GetNumCards() == 3);
+    REQUIRE(player.PrintCards() == "Steve's hand: 7♥ 3♣ 9♠");
+
+    const std::vector<Card*> returnedCards = player.ResetPlayer(true);
+    REQUIRE(returnedCards.size() == 3);
+    REQUIRE(returnedCards.at(0)->getValue() == 7);
+    REQUIRE(returnedCards.at(1)->getValue() == 3);
+    REQUIRE(returnedCards.at(2)->getValue() == 9);
+    REQUIRE(player.GetCards().empty());
+    REQUIRE(player.GetNumCards() == 0);
+    REQUIRE(player.GetScore() == 0);
+    REQUIRE(player.PrintCards() == "Steve's hand:");
+
+    for (Card* card : returnedCards) {
+        delete card;
+    }
+}
+
+TEST_CASE_METHOD(Racko, "Racko exposes valid deck, discard, and player lookup values",
+                 "[Racko][Lookup][Deck][Discard]") {
+    deck = new RackoDeck();
+    REQUIRE(GetTopCardFromDeck() != nullptr);
+    REQUIRE(GetTopCardFromDeck()->getValue() == 1);
+    REQUIRE(GetTopCardFromDiscard() == nullptr);
+
+    discardPile.push(new Card(42, Suit::HEARTS));
+    REQUIRE(GetTopCardFromDiscard() != nullptr);
+    REQUIRE(GetTopCardFromDiscard()->getValue() == 42);
+
+    TestPlayer* alpha = new TestPlayer("Alpha");
+    TestPlayer* bravo = new TestPlayer("Bravo");
+    alpha->ResetPlayer(false);
+    bravo->ResetPlayer(false);
+    alpha->DrawCard(new Card(7, Suit::SPADES));
+    alpha->DrawCard(new Card(11, Suit::HEARTS));
+    bravo->DrawCard(new Card(4, Suit::CLUBS));
+
+    AddPlayer(alpha);
+    AddPlayer(bravo);
+
+    std::vector<Card*> alphaCards = GetPlayerCardsByIdx(0);
+    REQUIRE(alphaCards.size() == 2);
+    REQUIRE(alphaCards.at(0)->getValue() == 7);
+    REQUIRE(alphaCards.at(1)->getValue() == 11);
+
+    std::vector<Card*> bravoCards = GetPlayerCardsByName("Bravo");
+    REQUIRE(bravoCards.size() == 1);
+    REQUIRE(bravoCards.at(0)->getValue() == 4);
+
+    REQUIRE(GetPlayerByIdx(1) == bravo);
+    REQUIRE(GetPlayerByName("Alpha") == alpha);
+    REQUIRE(GetPlayerByIdx(-1) == nullptr);
+    REQUIRE(GetPlayerByName("Ghost") == nullptr);
+}
+
+TEST_CASE_METHOD(Racko, "Racko scores valid player hands by index and name",
+                 "[Racko][ScoreRack][Player]") {
+    TestPlayer* alpha = new TestPlayer("Alpha");
+    TestPlayer* bravo = new TestPlayer("Bravo");
+
+    alpha->ResetPlayer(false);
+    bravo->ResetPlayer(false);
+
+    AddPlayer(alpha);
+    AddPlayer(bravo);
+
+    REQUIRE(alpha->GetScore() == 0);
+    ScoreRackByIdx(0);
+    REQUIRE(alpha->GetScore() == 55);
+
+    REQUIRE(bravo->GetScore() == 0);
+    ScoreRackByName("Bravo");
+    REQUIRE(bravo->GetScore() == 55);
+}
+
 TEST_CASE_METHOD(TestPlayer, "RackoPlayer centers text numbers", "[RackoPlayer][center]") {
     std::string twoChar = "ab";
     std::string threeChar = "abc";
