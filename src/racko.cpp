@@ -219,6 +219,7 @@ void Racko::ResetPlayers()
         delete player;
     }
     playerVector = {};
+    playerCnt = 0;
 }
 
 void Racko::AddPlayer(std::string playerName)
@@ -590,6 +591,6 @@ void Racko::ResetGame(bool keepPlayers)
     cardsInDiscard = 0;
 
     if (!keepPlayers) {
-        RemoveAllPlayers();
+        ResetPlayers();
     }
 }
