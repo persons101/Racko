@@ -12,7 +12,7 @@ private:
     
 protected:
     Player();
-    int numCards;
+    std::size_t numCards;
     std::string name;
     std::vector<Card*> myCards;
 public:
@@ -20,7 +20,7 @@ public:
     ~Player();
 
     std::string GetName() const;
-    int GetNumCards() const;    
+    std::size_t GetNumCards() const;    
 
     int GetScore() const;
     int AddScore(int);

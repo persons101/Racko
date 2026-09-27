@@ -28,7 +28,7 @@ Player::~Player()
     }
 }
 
-int Player::GetNumCards() const
+std::size_t Player::GetNumCards() const
 {
     return numCards; 
 }
