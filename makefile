@@ -61,7 +61,7 @@ tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
 
 testsWithCoverage: CXXFLAGS += $(COVERAGEFLAGS)
 testsWithCoverage: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(TESTFLAGS) $^ -o $(BIN_DIR)/testsCoverage.exe
+	$(CXX) $(CXXFLAGS) $(DEBUG) $(TESTFLAGS) $^ -o $(BIN_DIR)/$@.exe
 	./$(BIN_DIR)/$@.exe
 
 coverage: clean
