@@ -267,12 +267,11 @@ void Racko::SetCustomGoal(int goal)
 Racko::Racko()
 {
     int restartVal = 1;
-    int gameNumber = 0;
+    numGames = 0;
     do {
-        gameNumber++;
         SetupGame();
-        // Game turns
-        // Check for winner
+        // TODO Game turns
+        // TODO Check for winner
         restartVal = FinishGame();
         if (restartVal == 1) {
             ResetGame();
