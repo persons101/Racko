@@ -280,12 +280,17 @@ Racko::Racko()
     
 }
 
-int Racko::GetNumTurns() const
+std::size_t Racko::GetNumTurns() const
 {
     return numTurns;
 }
 
-int Racko::GetPlayerCount() const
+std::size_t Racko::GetNumGames() const
+{
+    return numGames;
+}
+
+unsigned int Racko::GetPlayerCount() const
 {
     return playerCnt;
 }
@@ -392,7 +397,9 @@ void Racko::ScoreRackByName(std::string playerName)
 
 void Racko::SetupGame()
 {
-    deck = new RackoDeck();
+    ResetGame();
+    numGames++;
+
     std::string inputString = "";
     int numPlayersToAdd = 0;
     
@@ -565,4 +572,24 @@ int Racko::FinishGame()
         return 1;
     }
     return 0; // Game Over
+}
+
+void Racko::ResetGame(bool keepPlayers)
+{
+    // maybe change delete deck -> add all cards to discardPile, then add all those to deck?
+    numTurns = 0;
+
+    if (deck)
+        delete deck;
+    deck = new RackoDeck();
+    cardsInDeck = 60;
+
+    while (!discardPile.empty()) {
+        discardPile.pop();
+    }
+    cardsInDiscard = 0;
+
+    if (!keepPlayers) {
+        RemoveAllPlayers();
+    }
 }

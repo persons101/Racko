@@ -11,8 +11,9 @@
 
 class Racko {
 private:
-    int numTurns = 0;
-    int playerCnt = 0;
+    std::size_t numTurns = 0;
+    std::size_t numGames = 0;
+    unsigned int playerCnt = 0;
     int cardsInDeck = 60;
     int cardsInDiscard = 0;
     const int RACKO_BONUS_REQ = 75;
@@ -26,6 +27,14 @@ protected:
     };
     Difficulty current_difficulty = Difficulty::Medium;
     int custom_difficulty_goal_score = -1;
+    int racko_bonus_req_handicap = 0;
+    int racko_bonus_handicap = 0;
+    int score_goal = 0;
+    
+    Deck* deck;
+    std::stack<Card*> discardPile;
+    std::vector<Player*> playerVector;
+    
     int GetTestScoreGoal() const { return score_goal; }
     int GetTestCustomGoal() const { return custom_difficulty_goal_score; }
     int GetTestDifficulty() const { return static_cast<int>(current_difficulty); }
@@ -33,14 +42,6 @@ protected:
     virtual void SetScoreGoal(Difficulty);
     virtual void SetDifficulty(Difficulty);
     virtual void SetCustomGoal(int); 
-
-    int racko_bonus_req_handicap = 0;
-    int racko_bonus_handicap = 0;
-    int score_goal = 0;
-
-    Deck* deck;
-    std::stack<Card*> discardPile;
-    std::vector<Player*> playerVector;
 
     virtual int CalculateRackScore(const std::vector<Card*>&) const;
     virtual char SelectDrawCard(int playerIdx) const;
@@ -58,8 +59,9 @@ protected:
 public:
     Racko();
 
-    int GetNumTurns() const;
-    int GetPlayerCount() const;
+    std::size_t GetNumTurns() const;
+    std::size_t GetNumGames() const;
+    unsigned int GetPlayerCount() const;
     int GetDeckCardCount() const;
     int GetDiscardCardCount() const;
     
@@ -78,7 +80,7 @@ public:
     virtual void ChooseDifficulty();
     virtual void PlayTurn();
     virtual int FinishGame();
-    virtual void ResetGame();
+    virtual void ResetGame(bool keepPlayers = false);
     
 };
 
