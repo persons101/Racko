@@ -18,8 +18,21 @@ private:
     const int RACKO_BONUS_REQ = 75;
     const int RACKO_BONUS = 25;
 protected:
+    enum class Difficulty {
+        Easy,
+        Medium,
+        Hard,
+        Custom
+    };
+    Difficulty current_difficulty = Difficulty::Medium;
+    int custom_difficulty_goal_score = -1;
+    int GetTestScoreGoal() const { return score_goal; }
+    int GetTestCustomGoal() const { return custom_difficulty_goal_score; }
+    int GetTestDifficulty() const { return static_cast<int>(current_difficulty); }
+
     int racko_bonus_req_handicap = 0;
     int racko_bonus_handicap = 0;
+    int score_goal = 0;
 
     Deck* deck;
     std::stack<Card*> discardPile;
@@ -38,7 +51,10 @@ protected:
     virtual void AddPlayer(std::string);
     virtual void AddPlayer(Player*);
 
-
+    virtual void SetScoreGoal(int);
+    virtual void SetScoreGoal(Difficulty);
+    virtual void SetDifficulty(Difficulty);
+    virtual void SetCustomGoal(int); 
 public:
     Racko();
 
@@ -58,6 +74,8 @@ public:
     void ScoreRackByName(std::string playerName);
     
     virtual void SetupGame();
+    virtual Player* CreatePlayer();
+    virtual void ChooseDifficulty();
     virtual void PlayTurn();
     virtual int FinishGame();
     virtual void ResetGame();
