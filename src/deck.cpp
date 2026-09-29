@@ -39,6 +39,12 @@ Card* Deck::MakeNewCard(Card* originalCard){
     return new Card(*originalCard);
 }
 
+void Deck::AddCardToDeck(Card * card)
+{
+    deck.push_back(card);
+    numCards++;
+}
+
 void Deck::AddCardsToDeck(int numCardsPerSuit, int numSuits){
     for (int i = 1; i <= numSuits; i++){
         for (int j = 1; j <= numCardsPerSuit; j++){

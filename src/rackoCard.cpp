@@ -7,6 +7,11 @@ RackoCard::RackoCard(int cardVal) : Card(cardVal, (Suit)0) { }
 
 RackoCard::RackoCard(Card card) : Card(card.getValue(), (Suit)0) { }
 
+Card *RackoCard::getCopy() const
+{
+    return new RackoCard(*this);
+}
+
 std::string RackoCard::getSuitSymbol() const { return ""; }
 
 std::string RackoCard::PrintCard() const {

@@ -13,6 +13,11 @@ Card::Card(std::tuple<int, Suit> vals) {
     *this = Card(std::get<0>(vals), std::get<1>(vals));
 }
 
+Card *Card::getCopy() const
+{
+    return new Card(*this);
+}
+
 int Card::getValue() const {
     return value;
 }

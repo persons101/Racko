@@ -18,6 +18,7 @@ protected:
     std::vector<Card*> deck;
     virtual Card* MakeNewCard(int, Suit);
     virtual Card* MakeNewCard(Card*);
+    virtual void AddCardToDeck(Card*);
     virtual void AddCardsToDeck(int numCardsPerSuit, int numSuits);
     virtual void AddJokersToDeck(int numJokers);
 

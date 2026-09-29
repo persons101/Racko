@@ -432,6 +432,14 @@ void Racko::SetupGame()
 
 Player *Racko::CreatePlayer()
 {
+    std::string input;
+    std::string name;
+    do {
+        std::cout << "Enter a name for your player: ";
+    } while (input != "");
+    
+    
+
     return nullptr;
 }
 

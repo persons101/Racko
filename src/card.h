@@ -22,6 +22,8 @@ private:
 public:
     Card(int, Suit);
     Card(std::tuple<int, Suit>);
+    virtual Card* getCopy() const; 
+
     int getValue() const;
     virtual char getValueChar() const;
     virtual std::string getValueString() const;
