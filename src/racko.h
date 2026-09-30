@@ -78,7 +78,9 @@ public:
     virtual void SetupGame();
     virtual Player* CreatePlayer();
     virtual void ChooseDifficulty();
+    virtual int Run();
     virtual void PlayTurn();
+    virtual int CheckForWinners();
     virtual int FinishGame();
     virtual void ResetGame(bool keepPlayers = false);
     

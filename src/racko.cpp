@@ -266,18 +266,27 @@ void Racko::SetCustomGoal(int goal)
 
 Racko::Racko()
 {
+    numGames = 0;    
+}
+
+int Racko::Run() {
     int restartVal = 1;
-    numGames = 0;
+    int winnerIdx;
     do {
         SetupGame();
         // TODO Game turns
         // TODO Check for winner
+        winnerIdx = -1;
+        do {
+            PlayTurn();
+            winnerIdx = CheckForWinners();
+        } while (winnerIdx < 0);
+
         restartVal = FinishGame();
         if (restartVal == 1) {
             ResetGame();
         }
     } while (restartVal == 1);
-    
 }
 
 std::size_t Racko::GetNumTurns() const
@@ -525,6 +534,16 @@ void Racko::PlayTurn()
             }
         }
     }
+}
+
+int Racko::CheckForWinners()
+{
+    for (std::size_t i = 0; i < playerCnt; i++) {
+        if (playerVector.at(i)->GetScore() >= score_goal)
+            return i;
+    }
+
+    return -1;
 }
 
 int Racko::FinishGame()
