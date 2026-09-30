@@ -12,6 +12,7 @@
 #include "../src/rackoDeck.h"
 #include "src/testDeck.h"
 #include "src/testPlayer.h"
+#include "src/testRacko.h"
 
 
 TEST_CASE("Testing Suit to string", "[Suit],[suit_name]"){
@@ -184,7 +185,7 @@ TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
     REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) ) );
 }
 
-TEST_CASE_METHOD(Racko, "TestPlayer functions", "[TestPlayer][Racko]") {
+TEST_CASE_METHOD(TestRacko, "TestPlayer functions", "[TestPlayer][Racko]") {
     TestPlayer p1;
     std::vector<Card*> cards = p1.GetCards(); // 1,5,10,15,20,25,30,35,36,38,40,2,3,4,6 
     REQUIRE(CalculateRackScore(cards) == 11 * 5);
@@ -193,14 +194,14 @@ TEST_CASE_METHOD(Racko, "TestPlayer functions", "[TestPlayer][Racko]") {
 
 }
 
-TEST_CASE_METHOD(Racko, "Racko game initialization", "[Racko]") {
+TEST_CASE_METHOD(TestRacko, "Racko game initialization", "[Racko]") {
     REQUIRE(GetNumTurns() == 0);
     REQUIRE(GetDeckCardCount() == 60);
     REQUIRE(GetDiscardCardCount() == 0);
     REQUIRE(GetPlayerCount() == 0);
 }
 
-TEST_CASE_METHOD(Racko, "Racko game score calculation", "[Racko][RackoCard][Score][Player]") {
+TEST_CASE_METHOD(TestRacko, "Racko game score calculation", "[Racko][RackoCard][Score][Player]") {
     // https://www.hasbro.com/common/instruct/Racko%281987%29.PDF
     RackoCard* card1 = new RackoCard(1);
     RackoCard* card2 = new RackoCard(2);
@@ -260,12 +261,12 @@ TEST_CASE_METHOD(Racko, "Racko game score calculation", "[Racko][RackoCard][Scor
 //  - test long strings
 //  = test expected behaviors
 
-TEST_CASE_METHOD(Racko, "SelectDrawCard returns error for invalid player",
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard returns error for invalid player",
                  "[Racko][SelectDrawCard]") {
     REQUIRE(SelectDrawCard(-1) == 'e');
 }
 
-TEST_CASE_METHOD(Racko, "SelectDrawCard chooses the deck",
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard chooses the deck",
                  "[Racko][SelectDrawCard]") {
     AddPlayer("Steve");
 
@@ -284,7 +285,7 @@ TEST_CASE_METHOD(Racko, "SelectDrawCard chooses the deck",
     REQUIRE(output.str().find("Choose a card") != std::string::npos);
 }
 
-TEST_CASE_METHOD(Racko, "SelectDrawCard chooses the discard pile",
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard chooses the discard pile",
                  "[Racko][SelectDrawCard]") {
     AddPlayer("Steve");
     discardPile.push(new Card(42, Suit::HEARTS));
@@ -304,7 +305,7 @@ TEST_CASE_METHOD(Racko, "SelectDrawCard chooses the discard pile",
     REQUIRE(output.str().find("Discard") != std::string::npos);
 }
 
-TEST_CASE_METHOD(Racko, "SelectDrawCard rejects invalid input before deck choice",
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard rejects invalid input before deck choice",
                  "[Racko][SelectDrawCard]") {
     AddPlayer("Steve");
 
@@ -322,7 +323,7 @@ TEST_CASE_METHOD(Racko, "SelectDrawCard rejects invalid input before deck choice
     REQUIRE(result == 'r');
 }
 
-TEST_CASE_METHOD(Racko, "SelectDrawCard rejects discard choice when pile is empty",
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard rejects discard choice when pile is empty",
                  "[Racko][SelectDrawCard]") {
     AddPlayer("Steve");
 
@@ -340,7 +341,7 @@ TEST_CASE_METHOD(Racko, "SelectDrawCard rejects discard choice when pile is empt
     REQUIRE(result == 'r');
 }
 
-TEST_CASE_METHOD(Racko, "SelectDrawCard accepts discard choice when pile is not empty",
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard accepts discard choice when pile is not empty",
                  "[Racko][SelectDrawCard]") {
     AddPlayer("Steve");
     discardPile.push(new Card(25, Suit::CLUBS));
@@ -360,7 +361,7 @@ TEST_CASE_METHOD(Racko, "SelectDrawCard accepts discard choice when pile is not 
     REQUIRE(output.str().find("25") != std::string::npos);
 }
 
-TEST_CASE_METHOD(Racko, "SelectDrawCard rejects multi-character choices",
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard rejects multi-character choices",
                  "[Racko][SelectDrawCard]") {
     AddPlayer("Steve");
 
@@ -446,7 +447,7 @@ TEST_CASE("Deck accessors, boundaries, shuffle, and output", "[Deck]") {
     REQUIRE(emptyDeck.PopBottomCard() == nullptr);
 }
 
-TEST_CASE_METHOD(DifficultyTestRacko, "Racko difficulty and score goal settings",
+TEST_CASE_METHOD(TestRacko, "Racko difficulty and score goal settings",
                  "[Racko][Difficulty][ScoreGoal]") {
     SECTION("Direct score goals include boundaries and negative values") {
         SetScoreGoal(0);
@@ -484,7 +485,7 @@ TEST_CASE_METHOD(DifficultyTestRacko, "Racko difficulty and score goal settings"
     }
 }
 
-TEST_CASE_METHOD(DifficultyTestRacko, "Racko difficulty selection handles invalid input",
+TEST_CASE_METHOD(TestRacko, "Racko difficulty selection handles invalid input",
                  "[Racko][Difficulty][ScoreGoal]") {
     std::istringstream input("x\n0\n2\n");
     auto* oldInput = std::cin.rdbuf(input.rdbuf());
@@ -662,7 +663,7 @@ TEST_CASE("Player reset and ordered value access", "[Player][ResetPlayer][GetCar
     }
 }
 
-TEST_CASE_METHOD(Racko, "Racko exposes valid deck, discard, and player lookup values",
+TEST_CASE_METHOD(TestRacko, "Racko exposes valid deck, discard, and player lookup values",
                  "[Racko][Lookup][Deck][Discard]") {
     deck = new RackoDeck();
     REQUIRE(GetTopCardFromDeck() != nullptr);
@@ -699,7 +700,7 @@ TEST_CASE_METHOD(Racko, "Racko exposes valid deck, discard, and player lookup va
     REQUIRE(GetPlayerByName("Ghost") == nullptr);
 }
 
-TEST_CASE_METHOD(Racko, "Racko scores valid player hands by index and name",
+TEST_CASE_METHOD(TestRacko, "Racko scores valid player hands by index and name",
                  "[Racko][ScoreRack][Player]") {
     TestPlayer* alpha = new TestPlayer("Alpha");
     TestPlayer* bravo = new TestPlayer("Bravo");
@@ -728,3 +729,20 @@ TEST_CASE_METHOD(TestPlayer, "RackoPlayer centers text numbers", "[RackoPlayer][
     REQUIRE(center(fourChar, 4) == "abcd");
 }
 
+TEST_CASE_METHOD(TestRacko, "Racko creates a player from a name", "[Racko][CreatePlayer]") {
+    std::string name = "Kathy";
+    
+    std::istringstream input(name + "\n1");
+    std::ostringstream output;
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+    
+    Player* player = CreatePlayer();
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(player->GetName() == name);
+
+    
+}

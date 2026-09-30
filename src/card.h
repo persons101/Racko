@@ -6,10 +6,10 @@
 #include <string>
 
 enum Suit {
-    SPADES = 1,
-    HEARTS = 2,
+    CLUBS = 0,
+    HEARTS = 1,
+    SPADES = 2,
     DIAMONDS = 3,
-    CLUBS = 4,
 };
 
 
@@ -22,6 +22,7 @@ private:
 public:
     Card(int, Suit);
     Card(std::tuple<int, Suit>);
+    virtual ~Card() = default;
     virtual Card* getCopy() const; 
 
     int getValue() const;

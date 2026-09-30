@@ -422,7 +422,7 @@ void Racko::SetupGame()
         }
     } while (numPlayersToAdd <= 0);
 
-    for (std::size_t i; i < numPlayersToAdd; i++) {
+    for (std::size_t i = 0; i < numPlayersToAdd; i++) {
         Player* player = CreatePlayer();
         AddPlayer(player);
     }
@@ -437,9 +437,10 @@ Player *Racko::CreatePlayer()
 
     do {
         std::cout << "Enter a name for your player: ";
-        std::cin >> input;
-        
-    } while (input != "");
+        if (!(std::cin >> input)) {
+            return nullptr; // Handle input failure in the caller.
+        }
+    } while (input.empty());
     
     player = new RackoPlayer(input);
 
@@ -590,7 +591,7 @@ void Racko::ResetGame(bool keepPlayers)
     // maybe change delete deck -> add all cards to discardPile, then add all those to deck?
     numTurns = 0;
 
-    if (deck)
+    if (deck != nullptr)
         delete deck;
     deck = new RackoDeck();
     cardsInDeck = 60;

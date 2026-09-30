@@ -24,7 +24,7 @@ protected:
 
 public:
     Deck();
-    ~Deck();
+    virtual ~Deck();
     Deck(int numCardsPerSuit, int numSuits);
     Deck(int numCardsPerSuit, int numSuits, int numJokers);
     void Shuffle();
