@@ -236,8 +236,7 @@ TEST_CASE_METHOD(TestRacko, "Racko game score calculation", "[Racko][RackoCard][
 
         REQUIRE(p1->GetName() == GetPlayerByIdx(0)->GetName());
 
-        TestDeck* testDeck = new TestDeck(); // top on left: 11,12,13,14,15
-        deck = testDeck;
+        deck = std::make_unique<TestDeck>();// top on left: 11,12,13,14,15
 
         std::istringstream input("0\n5\n");
         std::ostringstream output;
@@ -666,7 +665,7 @@ TEST_CASE("Player reset and ordered value access", "[Player][ResetPlayer][GetCar
 
 TEST_CASE_METHOD(TestRacko, "Racko exposes valid deck, discard, and player lookup values",
                  "[Racko][Lookup][Deck][Discard]") {
-    deck = new RackoDeck();
+    deck = std::make_unique<RackoDeck>();
     REQUIRE(GetTopCardFromDeck() != nullptr);
     REQUIRE(deck->GetCards().size() == 60);
     REQUIRE(GetTopCardFromDiscard() == nullptr);

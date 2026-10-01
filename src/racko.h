@@ -3,6 +3,7 @@
 
 #include <stack>
 #include <vector>
+#include <memory>
 
 #include "card.h"
 #include "deck.h"
@@ -31,7 +32,7 @@ protected:
     int racko_bonus_handicap = 0;
     int score_goal = 0;
     
-    Deck* deck = nullptr;
+    std::unique_ptr<Deck> deck;
     std::stack<Card*> discardPile;
     std::vector<Player*> playerVector;
     

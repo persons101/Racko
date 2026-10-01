@@ -327,10 +327,9 @@ void Racko::SetCustomGoal(int goal)
     custom_difficulty_goal_score = goal;
 }
 
-Racko::Racko()
+Racko::Racko() : deck(std::make_unique<RackoDeck>())
 {
     numGames = 0;   
-    deck = new RackoDeck(); 
 }
 
 int Racko::Run() {
@@ -689,9 +688,7 @@ void Racko::ResetGame(bool keepPlayers)
     // maybe change delete deck -> add all cards to discardPile, then add all those to deck?
     numTurns = 0;
 
-    if (deck != nullptr)
-        delete deck;
-    deck = new RackoDeck();
+    deck = std::make_unique<RackoDeck>();
     cardsInDeck = 60;
 
     while (!discardPile.empty()) {

@@ -4,3 +4,6 @@ tests/obj/*
 .vs/
 src/.playerWSet.*
 tests/RackoMethodTestStatus.xlsx
+html_coverage/
+*.html
+*.info

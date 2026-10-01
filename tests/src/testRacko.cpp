@@ -28,8 +28,5 @@ void TestRacko::SetupGame()
     AddPlayer(p2);
     AddPlayer(p3);
 
-    if (deck != nullptr) {
-        delete deck;
-        deck = new TestDeck();
-    }
+    deck = std::make_unique<TestDeck>();
 }
