@@ -31,7 +31,7 @@ protected:
     int racko_bonus_handicap = 0;
     int score_goal = 0;
     
-    Deck* deck;
+    Deck* deck = nullptr;
     std::stack<Card*> discardPile;
     std::vector<Player*> playerVector;
     
@@ -42,14 +42,18 @@ protected:
     virtual void SetScoreGoal(Difficulty);
     virtual void SetDifficulty(Difficulty);
     virtual void SetCustomGoal(int); 
+    int GetPlayerIdxByName(std::string playerName) const;
 
     virtual int CalculateRackScore(const std::vector<Card*>&) const;
+
+    virtual void AddStartingCardsToPlayer(Player*&);
     virtual char SelectDrawCard(int playerIdx) const;
     virtual char SelectDrawCard(Player*) const;
     virtual int DrawCard(int playerIdx, bool);
     virtual int DrawCard(Player*, bool);
+    virtual int SelectCardIdxToDiscard(int playerIdx);
+    virtual int SelectCardIdxToDiscard(Player*);
     virtual int AddCardToDiscard(Card*);
-    int GetPlayerIdxByName(std::string playerName) const;
     virtual int PlayTurnForPlayerByIdx(int playerIdx);
     virtual int PlayTurnForPlayerByName(std::string playerName);
     virtual void ResetPlayers();
@@ -80,6 +84,7 @@ public:
     virtual void ChooseDifficulty();
     virtual int Run();
     virtual void PlayTurn();
+    virtual void PrintTurnNum();
     virtual int CheckForWinners();
     virtual int FinishGame();
     virtual void ResetGame(bool keepPlayers = false);

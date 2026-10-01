@@ -3,15 +3,16 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include <exception>
 #include "rackoPlayer.h"
 #include "rackoDeck.h"
 
 int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
 {
-    int score = 0;
+    int score = 5;
 
     for (std::size_t i = 0; i < cards.size() - 1; i++) {
-        if (cards.at(1 + i) > cards.at(i))
+        if (cards.at(1 + i)->getValue() > cards.at(i)->getValue())
             score += 5;
         else 
             break;
@@ -23,30 +24,33 @@ int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
     return score;
 }
 
+void Racko::AddStartingCardsToPlayer(Player*& player)
+{
+    for (int i = 0; i < 10; i++) {
+        DrawCard(player, false);        
+    }
+}
+
 char Racko::SelectDrawCard(int playerIdx) const
 {
     /// Shows the player at @param{playerIdx} the top of the draw and discard piles
     /// @return D'r'aw pile, D'i'scard, or 'e'rror
-    Player* player = GetPlayerByIdx(playerIdx);
-    if (player == nullptr) {
-        return 'e';
-    }
 
-    return SelectDrawCard(player);
+    return SelectDrawCard(GetPlayerByIdx(playerIdx));
 }
 
 char Racko::SelectDrawCard(Player * player) const
 {
     /// Shows the player @param{player} the top of the draw and discard piles
     /// @return D'r'aw pile, D'i'scard, or 'e'rror
-    if (player == nullptr) {
+    if (player == nullptr || deck->GetTopCard() == nullptr) {
         return 'e';
     }
     std::string input = "";
 
     std::cout << player->PrintCards() << "\n";
     std::cout << "Deck (0): " << deck->GetTopCard()->PrintCardShort() << ", Discard (1): " << ((!discardPile.empty()) ? discardPile.top()->PrintCardShort() : "-") << "\n";
-    std::cout << "Choose a card: Deck='0', Discard='1'";
+    std::cout << "Choose a card: Deck='0', Discard='1': ";
     
     // input validation
     while (input != "0" && input != "1") {
@@ -55,6 +59,7 @@ char Racko::SelectDrawCard(Player * player) const
             input = "-";
         }
         else if (discardPile.empty() && input == "1"){
+            std::cout << "Uh-oh, there are no cards in the discard pile to draw! Try again: ";
             input = "-";
         }
 
@@ -73,13 +78,7 @@ char Racko::SelectDrawCard(Player * player) const
 
 int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
 {
-    Player* player = GetPlayerByIdx(playerIdx);
-
-    if (player == nullptr){
-        return -1;
-    }
-
-    return DrawCard(player, isDiscardPileChosen);
+    return DrawCard(GetPlayerByIdx(playerIdx), isDiscardPileChosen);
 }
 
 int Racko::DrawCard(Player * player, bool isDiscardPileChosen)
@@ -95,12 +94,17 @@ int Racko::DrawCard(Player * player, bool isDiscardPileChosen)
                 // draw from deck
                 card = deck->PopTopCard();
                 cardsInDeck--;
+                break;
             case true:
                 // draw from discard
                 // TODO create discardPile.h/.cpp to handle stack manipulation
+                if (discardPile.empty())
+                    return -4;
+
                 card = discardPile.top();
                 discardPile.pop();
                 cardsInDiscard--;
+                break;
             default:
                 // should never run
                 throw std::out_of_range("Switch-case failure");
@@ -121,6 +125,47 @@ int Racko::DrawCard(Player * player, bool isDiscardPileChosen)
     }
 
     return 0;
+}
+
+int Racko::SelectCardIdxToDiscard(int playerIdx)
+{
+    return SelectCardIdxToDiscard(GetPlayerByIdx(playerIdx));
+}
+
+int Racko::SelectCardIdxToDiscard(Player * player)
+{
+    if (player == nullptr) {
+        return -1;
+    }
+
+    std::cout << player->PrintCards();
+    std::cout << "Select card to discard using the # beneath it: ";
+
+    // input validation
+    std::string input = "";
+    int inputNum = -1;
+    while (!(inputNum % 5 == 0 && inputNum >= 5 && inputNum <= 50)) {
+        if (!(std::cin >> input)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
+        try {
+            inputNum = stoi(input);
+        }
+        catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } 
+        catch (const std::out_of_range& e) {
+            std::cerr << "Out of range: The value is too large or too small for an int." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
+
+    return inputNum;
 }
 
 int Racko::AddCardToDiscard(Card * cardToAdd)
@@ -176,30 +221,33 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
     switch (drawSelectionResult) {
         case 'r':
             isDiscardPileChosen = false;
+            break;
         case 'i':
             isDiscardPileChosen = true;
+            break;
         default:
             return -3;
     }
 
     // 3
     int drawStatus = DrawCard(playerIdx, isDiscardPileChosen);
-
     if (drawStatus != 0) {
         return -4;
     }
 
     // 4
-    // TODO
+    int idxToReplace = SelectCardIdxToDiscard(player);
 
     // 5
-    // TODO
+    int discardStatus = AddCardToDiscard(player->DiscardCard(idxToReplace));
+    if (drawStatus != 0) {
+        return -5;
+    }
 
     // 6
-    int score = CalculateRackScore(player->GetCards());
-    // 7
     if (player->IsCompletedWithRack()) {
-        return score;
+        int score = CalculateRackScore(player->GetCards());
+        return score; // 7 handled by caller
     }
     
     return 0;
@@ -207,10 +255,7 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
 
 int Racko::PlayTurnForPlayerByName(std::string playerName)
 {
-    int idx = GetPlayerIdxByName(playerName);
-
-    PlayTurnForPlayerByIdx(idx);
-    return 0;
+    return PlayTurnForPlayerByIdx(GetPlayerIdxByName(playerName));
 }
 
 void Racko::ResetPlayers()
@@ -245,12 +290,19 @@ void Racko::SetScoreGoal(Difficulty difficulty)
     switch (difficulty) {
         case Difficulty::Easy:
             SetScoreGoal(100);
+            break;
         case Difficulty::Medium:
             SetScoreGoal(150);
+            break;
         case Difficulty::Hard:
             SetScoreGoal(200);
+            break;
         case Difficulty::Custom:
             SetScoreGoal(custom_difficulty_goal_score);
+            break;
+        default:
+            std::cerr << ">>> Error: SetScoreGoal(difficulty) difficulty not implemented!\n";
+            SetScoreGoal(150);
     }
 }
 
@@ -266,27 +318,35 @@ void Racko::SetCustomGoal(int goal)
 
 Racko::Racko()
 {
-    numGames = 0;    
+    numGames = 0;   
+    deck = new RackoDeck(); 
 }
 
 int Racko::Run() {
     int restartVal = 1;
-    int winnerIdx;
-    do {
-        SetupGame();
-        // TODO Game turns
-        // TODO Check for winner
-        winnerIdx = -1;
+    int winnerIdx = -1;
+    
+    try {
         do {
-            PlayTurn();
-            winnerIdx = CheckForWinners();
-        } while (winnerIdx < 0);
+            SetupGame();
+            winnerIdx = -1;
+            do {
+                PlayTurn();
+                winnerIdx = CheckForWinners();
+            } while (winnerIdx < 0);
 
-        restartVal = FinishGame();
-        if (restartVal == 1) {
-            ResetGame();
-        }
-    } while (restartVal == 1);
+            restartVal = FinishGame();
+            if (restartVal == 1) {
+                ResetGame();
+            }
+        } while (restartVal == 1);
+    }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return -1;
+    }
+
+    return winnerIdx;
 }
 
 std::size_t Racko::GetNumTurns() const
@@ -329,15 +389,11 @@ Card *Racko::GetTopCardFromDeck() const
 
 Card *Racko::GetTopCardFromDiscard() const
 {
-    try {
-        Card* card = discardPile.top();
-        return card;
-    }
-    catch (const std::out_of_range& e) {
-        std::cerr << e.what() << std::endl;
+    if (discardPile.empty()) {
+        return nullptr;
     }
 
-    return nullptr;
+    return discardPile.top();
 }
 
 std::vector<Card *> Racko::GetPlayerCardsByIdx(int playerIdx) const
@@ -395,13 +451,7 @@ void Racko::ScoreRackByIdx(int playerIdx)
 
 void Racko::ScoreRackByName(std::string playerName)
 {
-    Player* player = GetPlayerByName(playerName);
-    if (!player) {
-        return;
-    }
-
-    int score = CalculateRackScore(player->GetCards());
-    player->AddScore(score);
+    ScoreRackByIdx(GetPlayerIdxByName(playerName));
 }
 
 void Racko::SetupGame()
@@ -433,6 +483,7 @@ void Racko::SetupGame()
 
     for (std::size_t i = 0; i < numPlayersToAdd; i++) {
         Player* player = CreatePlayer();
+        AddStartingCardsToPlayer(player);
         AddPlayer(player);
     }
 
@@ -460,7 +511,7 @@ void Racko::ChooseDifficulty()
 {
     Difficulty difficulty;
     std::string inputString;
-    int inputSetting;
+    int inputSetting = 0;
     std::cout << "Please choose a difficulty: (1)Easy, (2)Medium, (3)Hard, (4)Custom\n";
     do {
         try {
@@ -483,10 +534,13 @@ void Racko::ChooseDifficulty()
     switch (inputSetting) {
         case 1:
             difficulty = Difficulty::Easy;
+            break;
         case 2:
             difficulty = Difficulty::Medium;
+            break;
         case 3:
             difficulty = Difficulty::Hard;
+            break;
         case 4:
             difficulty = Difficulty::Custom;
             std::cout << "Custom difficulty selected. Set a point goal: ";
@@ -509,31 +563,42 @@ void Racko::ChooseDifficulty()
                     std::cin.clear();
                     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 }
-            } while (inputSetting <= 0 || inputSetting > 4);
+            } while (inputSetting <= 0);
 
             SetCustomGoal(inputSetting);
+            break;
         default: 
             difficulty = Difficulty::Medium;
     }
 
     SetDifficulty(difficulty);
+    SetScoreGoal(difficulty);
 }
 
 void Racko::PlayTurn()
 {
     bool isRoundOver = false;
     for (int i = 0; i < playerVector.size() && !isRoundOver; i++) {
+        PrintTurnNum();
+        
         // score is returned for possible subclasses/accessors, but value is not used in this implementation.
-        int playerScore = 0;
-        playerScore = PlayTurnForPlayerByIdx(i); 
+        int playerScore = PlayTurnForPlayerByIdx(i); 
 
-        if (playerScore != 0) {
+        if (playerScore < 0) {
+            std::cerr << ">>> Error in PlayTurnForPlayerByIdx() for player " << i << "\n";
+        }
+        else if (playerScore > 0) {
             isRoundOver = true;
             for (int j = 0; j < playerVector.size(); j++) {
                 ScoreRackByIdx(j);
             }
         }
     }
+}
+
+void Racko::PrintTurnNum()
+{
+    std::cout << ("Round " + std::to_string(numTurns) + "\n");
 }
 
 int Racko::CheckForWinners()
@@ -569,9 +634,12 @@ int Racko::FinishGame()
                     pThird = pSecond;
                     pSecond = player;
                 }
-                else if (pThird->GetScore() < currPlayerScore) {
-                    pThird = player;
+                else if (pThird) {
+                    if (pThird->GetScore() < currPlayerScore) {
+                        pThird = player;
+                    }
                 }
+                
             }
         }
 
@@ -581,13 +649,13 @@ int Racko::FinishGame()
     }
 
     std::cout << "--------------------------------------\n";
-    std::cout << "First Place: " << pFirst->GetName() << "\n";
+    std::cout << "First Place: " << (pFirst ? pFirst->GetName() : "") << "\n";
     if (playerCnt > 1) {
-        std::cout << "Second Place: " << pSecond->GetName() << "\n";
+        std::cout << "Second Place: " << (pSecond ? pSecond->GetName() : "") << "\n";
         if (playerCnt > 2) {
-            std::cout << "Third Place: " << pThird->GetName() << "\n";
+            std::cout << "Third Place: " << (pThird ? pThird->GetName() : "") << "\n";
             if (playerCnt > 3) {
-                std::cout << "Last Place: " << pLast->GetName() << "\n";
+                std::cout << "Last Place: " << (pLast ? pLast->GetName() : "") << "\n";
             }
         }
     }

@@ -133,3 +133,9 @@ bool Card::compareCards::operator() (const Card* a, const std::tuple<int,Suit> b
         return a->value < std::get<0>(b);
     return (int)a->suit < (int)(std::get<1>(b));
 };
+
+std::ostream &operator<<(std::ostream& os, const Card & card)
+{
+    os << card.PrintCardShort();
+    return os;
+}

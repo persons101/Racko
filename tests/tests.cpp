@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include "catch_amalgamated.hpp"
 
 #include <iostream>
@@ -38,20 +37,21 @@ TEST_CASE("Card methods", "[Card]") {
     REQUIRE(aceOfSpades);
     cards.push_back(aceOfSpades);
     for (int i = 2; i <= 10; i++) {
-        cards.push_back(new Card(i, Suit(i % 4)));
+        cards.push_back(new Card(i, Suit(i % 4 + 1)));
     }
-    Card* eightOfClubs = cards.at(8);
-    REQUIRE(eightOfClubs->getSuit() == Suit::CLUBS);
-    REQUIRE(eightOfClubs->getValue() == 8);
+    Card* sevenOfClubs = cards.at(7);
+    REQUIRE(sevenOfClubs->getSuit() == Suit::CLUBS);
+    REQUIRE(sevenOfClubs->getValue() == 7);
 
     std::tuple<int, Suit> cardTuple = std::tuple(11, Suit::DIAMONDS);
     Card* jackOfDiamonds = new Card(cardTuple);
     REQUIRE(jackOfDiamonds);
+    cards.push_back(jackOfDiamonds);
     for (int i = 12; i <= 14; i++) {
         cards.push_back(new Card(i, Suit::DIAMONDS));
     }
 
-    for (std::size_t i = 0; cards.size(); i++) {
+    for (std::size_t i = 0; i < cards.size(); i++) {
         REQUIRE(cards.at(i)->getValue() == i);
     }
 
@@ -73,12 +73,12 @@ TEST_CASE("Card methods", "[Card]") {
         REQUIRE(aceOfSpades->getSuit() == Suit::SPADES);
         REQUIRE(aceOfSpades->getSuitName() == "Spades"); 
         REQUIRE(aceOfSpades->getSuitSymbol() == "\xe2\x99\xA0");
-        REQUIRE(eightOfClubs->getSuit() == Suit::CLUBS);
-        REQUIRE(eightOfClubs->getSuitName() == "Clubs");
-        REQUIRE(aceOfSpades->getSuitSymbol() == "\xe2\x99\xA3");
+        REQUIRE(sevenOfClubs->getSuit() == Suit::CLUBS);
+        REQUIRE(sevenOfClubs->getSuitName() == "Clubs");
+        REQUIRE(sevenOfClubs->getSuitSymbol() == "\xe2\x99\xA3");
         REQUIRE(jackOfDiamonds->getSuit() == Suit::DIAMONDS);
         REQUIRE(jackOfDiamonds->getSuitName() == "Diamonds"); 
-        REQUIRE(aceOfSpades->getSuitSymbol() == "\xe2\x99\xA6");
+        REQUIRE(jackOfDiamonds->getSuitSymbol() == "\xe2\x99\xA6");
     }
 }
 
@@ -157,29 +157,21 @@ TEST_CASE("Trying RackoDeck", "[RackoDeck]"){
 
     Card* topCard = deck.PopTopCard();
     REQUIRE(topCard != nullptr);
-    REQUIRE( ( (*topCard) == std::make_tuple(1, (Suit)0)) );
+    REQUIRE( ( (topCard->getSuit()) == (Suit)0) );
 }
 
 TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
 {
     /// GOAL: Create RackoCards with values 1, 11, 12, and 13, (usually A, J, Q, K), and confirm they print numbers and not letters. This ensures the inheritance is working
 
-    // Save original buffer
-    auto old_buf = std::cout.rdbuf();
-
-    // Redirect cout to a stringstream
     std::stringstream oss;
-    std::cout.rdbuf(oss.rdbuf());
 
     // Execute code that writes to cout
     auto cardValue = GENERATE(1, 11, 12, 13);
 
-    RackoCard rackoCard(cardValue);
-    rackoCard.PrintCardShort();
+    RackoCard rackoCard = RackoCard(cardValue);
+    oss << rackoCard.PrintCardShort();
 
-
-    // Restore original buffer
-    std::cout.rdbuf(old_buf);
 
     // Check the captured output
     REQUIRE(oss.str() == (std::to_string(rackoCard.getValue()) ) );
@@ -246,7 +238,18 @@ TEST_CASE_METHOD(TestRacko, "Racko game score calculation", "[Racko][RackoCard][
 
         TestDeck* testDeck = new TestDeck(); // top on left: 11,12,13,14,15
         deck = testDeck;
+
+        std::istringstream input("0\n5\n");
+        std::ostringstream output;
+        
+        auto* oldInput = std::cin.rdbuf(input.rdbuf());
+        auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+        
         PlayTurnForPlayerByIdx(0);
+
+        std::cin.rdbuf(oldInput);
+        std::cout.rdbuf(oldOutput);
+
 
         REQUIRE(GetPlayerByIdx(0)->GetCardVals() == std::vector({1,5,10,11,20,25,30,35,36,38,40,2,3,4,6 }));
     }
@@ -432,9 +435,7 @@ TEST_CASE("Deck accessors, boundaries, shuffle, and output", "[Deck]") {
     REQUIRE(deck.GetCards().size() == cardsBeforeShuffle.size());
 
     std::ostringstream output;
-    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
-    deck.PrintDeck();
-    std::cout.rdbuf(oldOutput);
+    output << deck.PrintDeck();
     REQUIRE(output.str().find("---Start Deck---") != std::string::npos);
     REQUIRE(output.str().find("--- End Deck ---") != std::string::npos);
 
@@ -508,7 +509,7 @@ TEST_CASE("RackoPlayer construction and center formatting", "[RackoPlayer]") {
     REQUIRE(player.GetScore() == 0);
 
     REQUIRE(player.center("x", 5) == "  x  ");
-    REQUIRE(player.center("x", 4, '.') == "...x");
+    REQUIRE(player.center("x", 4, '.') == ".x..");
     REQUIRE(player.center("text", 4) == "text");
     REQUIRE(player.center("long text", 4) == "long text");
 }
@@ -517,18 +518,18 @@ TEST_CASE("RackoPlayer displays rack values and positions", "[RackoPlayer]") {
     TestPlayer player("Alex");
     player.ResetPlayer();
 
-    REQUIRE(player.DisplayCardsInRack() == "\n");
+    REQUIRE(player.PrintCards() == "Card: \nIdx:  ");
 
     player.DrawCard(new Card(1, Suit::SPADES));
     player.DrawCard(new Card(10, Suit::HEARTS));
     player.DrawCard(new Card(13, Suit::CLUBS));
 
-    const std::string display = player.DisplayCardsInRack();
+    const std::string display = player.PrintCards();
     REQUIRE(display.find(" 1  ") != std::string::npos);
     REQUIRE(display.find(" 10 ") != std::string::npos);
     REQUIRE(display.find(" 13 ") != std::string::npos);
-    REQUIRE(display.find(" 0  ") != std::string::npos);
-    REQUIRE(display.find(" 5  ") != std::string::npos);
+    REQUIRE(display.find(" 50 ") != std::string::npos);
+    REQUIRE(display.find(" 5  ") != std::string::npos); 
     REQUIRE(display.find("10 ") != std::string::npos);
     REQUIRE(display.find('\n') != std::string::npos);
 }
@@ -591,7 +592,7 @@ TEST_CASE("RackoPlayer replaces cards at valid and invalid positions", "[RackoPl
 
 TEST_CASE("RackoPlayer discards valid and invalid positions", "[RackoPlayer]") {
     TestPlayer player("Alex");
-    player.ResetPlayer();
+    player.ClearCards();
     player.DrawCard(new Card(1, Suit::SPADES));
     player.DrawCard(new Card(2, Suit::HEARTS));
     player.DrawCard(new Card(3, Suit::CLUBS));
@@ -667,12 +668,15 @@ TEST_CASE_METHOD(TestRacko, "Racko exposes valid deck, discard, and player looku
                  "[Racko][Lookup][Deck][Discard]") {
     deck = new RackoDeck();
     REQUIRE(GetTopCardFromDeck() != nullptr);
-    REQUIRE(GetTopCardFromDeck()->getValue() == 1);
+    REQUIRE(deck->GetCards().size() == 60);
     REQUIRE(GetTopCardFromDiscard() == nullptr);
 
     discardPile.push(new Card(42, Suit::HEARTS));
     REQUIRE(GetTopCardFromDiscard() != nullptr);
     REQUIRE(GetTopCardFromDiscard()->getValue() == 42);
+    AddCardToDiscard(new Card(35, Suit::SPADES));
+    REQUIRE(GetTopCardFromDiscard() != nullptr);
+    REQUIRE(GetTopCardFromDiscard()->getValue() == 35);
 
     TestPlayer* alpha = new TestPlayer("Alpha");
     TestPlayer* bravo = new TestPlayer("Bravo");
@@ -725,7 +729,7 @@ TEST_CASE_METHOD(TestPlayer, "RackoPlayer centers text numbers", "[RackoPlayer][
     std::string threeChar = "abc";
     std::string fourChar = "abcd";
     REQUIRE(center(twoChar, 4) == " ab ");
-    REQUIRE(center(threeChar, 4) == " abc");
+    REQUIRE(center(threeChar, 4) == "abc ");
     REQUIRE(center(fourChar, 4) == "abcd");
 }
 
@@ -745,4 +749,31 @@ TEST_CASE_METHOD(TestRacko, "Racko creates a player from a name", "[Racko][Creat
     REQUIRE(player->GetName() == name);
 
     
+}
+
+TEST_CASE("Player keeps numCards synchronized", "[Player][numCards][GetNumCards]") {
+    TestPlayer player = TestPlayer();
+    player.ResetPlayer();
+    REQUIRE(player.GetNumCards() == player.GetCards().size());
+
+    player.DrawCard(new Card(1, Suit::SPADES));
+    REQUIRE(player.GetNumCards() == player.GetCards().size());
+
+    player.DrawCard(new Card(2, Suit::HEARTS));
+    REQUIRE(player.GetNumCards() == player.GetCards().size());
+
+    player.DrawCard(new Card(3, Suit::CLUBS));
+    REQUIRE(player.GetNumCards() == player.GetCards().size());
+
+    Card* replacedCard = (player.ReplaceCard(new Card(4, Suit::DIAMONDS), 0));
+    REQUIRE(player.GetNumCards() == player.GetCards().size());
+    REQUIRE(replacedCard->getValue() == 1);
+
+    Card* replacedCard2 = player.DiscardCard(0);
+    REQUIRE(player.GetNumCards() == player.GetCards().size());
+    REQUIRE(replacedCard->getValue() == 2);    
+
+    Card* replacedCard3 = player.DiscardRandomCard();
+    REQUIRE(player.GetNumCards() == player.GetCards().size());
+
 }

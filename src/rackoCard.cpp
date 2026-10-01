@@ -5,7 +5,7 @@
 
 RackoCard::RackoCard(int cardVal) : Card(cardVal, (Suit)0) { }
 
-RackoCard::RackoCard(Card card) : Card(card.getValue(), (Suit)0) { }
+RackoCard::RackoCard(const Card& card) : Card(card.getValue(), (Suit)0) { }
 
 Card *RackoCard::getCopy() const
 {

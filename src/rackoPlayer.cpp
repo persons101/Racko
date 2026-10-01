@@ -37,22 +37,22 @@ Card* RackoPlayer::DiscardCard(int cardPos, Suit suit)
     return nullptr;
 }
 
-std::string RackoPlayer::DisplayCardsInRack() const
+std::string RackoPlayer::PrintCards() const
 {
     std::vector<int> cardVals = GetCardVals();
-    const int numCards = cardVals.size();
+    const int cardValsSize = cardVals.size();
 
-    std::string cardLine = "";
-    std::string valueLine = "";
+    std::string cardLine = "Card: ";
+    std::string posLine = "Idx:  ";
     std::string bothLines = "";
     int width = 4;
 
-    for (std::size_t i = 0; i < numCards; i++) {
+    for (std::size_t i = 0; i < cardValsSize; i++) {
         cardLine += center(std::to_string(cardVals.at(i)), width);
-        valueLine += center(std::to_string(5*i), width);
+        posLine += center(std::to_string(5*(i+1)), width);
     }
 
-    bothLines = cardLine + "\n" + valueLine;
+    bothLines = cardLine + "\n" + posLine;
 
     return bothLines;
 }
@@ -71,8 +71,8 @@ int RackoPlayer::SelectCardToReplace(const Card * cardToReplace) const
 {
     int idx = -1;
     std::string input = "";
-    std::cout << DisplayCardsInRack() << "\n";
-    std::cout << "Choose a card to remove (e.g. '15'): ";
+    std::cout << PrintCards() << "\n";
+    std::cout << "Choose a card to remove for " << cardToReplace << " (e.g. '15'): ";
     do
     {
         try {
@@ -99,7 +99,7 @@ Card *RackoPlayer::ReplaceCard(Card * newCard, int pos)
 {
     if (newCard == nullptr ||
         pos < 0 ||
-        static_cast<std::size_t>(pos) >= GetNumCards()) {
+        static_cast<std::size_t>(pos) >= myCards.size()) {
         return nullptr;
     }
     

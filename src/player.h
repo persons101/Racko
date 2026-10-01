@@ -12,12 +12,12 @@ private:
     
 protected:
     Player();
-    std::size_t numCards;
+    std::size_t numCards = 0;
     std::string name;
     std::vector<Card*> myCards;
 public:
     Player(std::string);
-    ~Player();
+    virtual ~Player();
 
     std::string GetName() const;
     std::size_t GetNumCards() const;    

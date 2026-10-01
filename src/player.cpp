@@ -6,7 +6,7 @@
 
 Player::Player() { *this = Player("Test"); }
 
-Player::Player(std::string inName) : name(inName), score(0), numCards(0) {}
+Player::Player(std::string inName) : score(0), name(inName), numCards(0) {}
 
 std::string Player::GetName() const {
     return name;
@@ -50,6 +50,7 @@ std::vector<Card*> Player::ResetPlayer(bool returnToDeck)
     }
     
     myCards = {};
+    numCards = 0;
 
     return cardsToDeck;
 }

@@ -34,7 +34,7 @@ public:
     Card* GetBottomCard() const;
     int GetNumCards() const { return numCards; }
     std::vector<Card*> GetCards() const { return deck; }
-    virtual void PrintDeck() const;
+    virtual std::string PrintDeck() const;
 };
 
 

@@ -21,12 +21,10 @@ Deck::~Deck()
     }
 }
 
-Deck::Deck(int numCardsPerSuit, int numSuits){
-    *this = Deck(numCardsPerSuit, numSuits, 0);
-}
+Deck::Deck(int numCardsPerSuit, int numSuits) : Deck(numCardsPerSuit, numSuits, 0) {}
 
 
-Deck::Deck(int numCardsPerSuit, int numSuits, int numJokers) : numSuits(numSuits), numCards(0) {
+Deck::Deck(int numCardsPerSuit, int numSuits, int numJokers) : numCards(0), numSuits(numSuits) {
     AddCardsToDeck(numCardsPerSuit, numSuits);
     AddJokersToDeck(numJokers);
 }
@@ -84,7 +82,8 @@ Card* Deck::PopBottomCard() {
 }
 
 Card* Deck::GetTopCard() const {
-    if (deck.size() == 0)
+    
+    if (deck.size() <= 0)
         return nullptr;
 
     Card* topCard = deck.at(0);
@@ -107,11 +106,14 @@ void Deck::Shuffle() {
     shuffle (deck.begin(), deck.end(), std::default_random_engine(seed));
 }
 
-void Deck::PrintDeck() const {
-    std::cout << "---Start Deck---\n";
+std::string Deck::PrintDeck() const {
+    std::string returnVal = "";
+    returnVal += "---Start Deck---\n";
     for (const auto& card : deck) {
-        card->PrintCardShort();
+        returnVal += card->PrintCardShort();
     }
-    std::cout << "\n";
-    std::cout << "--- End Deck ---\n";
+    returnVal += "\n";
+    returnVal += "--- End Deck ---\n";
+
+    return returnVal;
 }

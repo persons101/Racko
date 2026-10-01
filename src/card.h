@@ -47,6 +47,8 @@ public:
                           virtual bool operator() (const Card, const std::tuple<int,Suit>) const; 
                           virtual bool operator() (const Card*, const std::tuple<int,Suit>) const; 
                         };
+
+    friend std::ostream& operator<<(std::ostream& os, const Card&);
 };
 
 #endif
