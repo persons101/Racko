@@ -9,15 +9,21 @@
 
 int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
 {
+    if (cards.size() == 0) {
+        return 0;
+    }
+
     int score = 5;
 
     for (std::size_t i = 0; i < cards.size() - 1; i++) {
-        if (cards.at(1 + i)->getValue() > cards.at(i)->getValue())
+        if (cards.at(1 + i)->getValue() > cards.at(i)->getValue()) {
             score += 5;
-        else 
+        }
+        else {
             break;
+        }
     }
-
+                                                                                                                                                                                 
     if (score >= (RACKO_BONUS_REQ + racko_bonus_req_handicap))
         score += (RACKO_BONUS + racko_bonus_handicap);
 
@@ -165,7 +171,7 @@ int Racko::SelectCardIdxToDiscard(Player * player)
         }
     }
 
-    return inputNum;
+    return (inputNum / 5) - 1;
 }
 
 int Racko::AddCardToDiscard(Card * cardToAdd)
@@ -229,6 +235,7 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
             return -3;
     }
 
+    // TODO Change 3-5 with RackoPlayer::ReplaceCard()
     // 3
     int drawStatus = DrawCard(playerIdx, isDiscardPileChosen);
     if (drawStatus != 0) {

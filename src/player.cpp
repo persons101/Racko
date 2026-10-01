@@ -63,7 +63,9 @@ std::vector<Card *> Player::GetCards() const
 std::vector<int> Player::GetCardVals() const
 {
     std::vector<int> myCardVals;
-    for (Card* card : myCards) {
+    Card* card = nullptr;
+    for (std::size_t i = 0; i < myCards.size(); i++) {
+        card = myCards.at(i);
         myCardVals.push_back(card->getValue());
     }
     return myCardVals;

@@ -2,6 +2,7 @@
 
 #include <set> // std::set is an ORDERED SET
 #include "testPlayer.h"
+#include "testDeck.h"
 
 void TestRacko::SetupGame()
 {
@@ -26,4 +27,9 @@ void TestRacko::SetupGame()
     AddPlayer(p1);
     AddPlayer(p2);
     AddPlayer(p3);
+
+    if (deck != nullptr) {
+        delete deck;
+        deck = new TestDeck();
+    }
 }

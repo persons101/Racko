@@ -180,9 +180,9 @@ TEST_CASE("RackoCard vs Card", "[RackoCard][cout]")
 TEST_CASE_METHOD(TestRacko, "TestPlayer functions", "[TestPlayer][Racko]") {
     TestPlayer p1;
     std::vector<Card*> cards = p1.GetCards(); // 1,5,10,15,20,25,30,35,36,38,40,2,3,4,6 
-    REQUIRE(CalculateRackScore(cards) == 11 * 5);
-    REQUIRE(p1.AddScore(CalculateRackScore(cards)) == 55);
-    REQUIRE(p1.GetScore() == 55);
+    REQUIRE(CalculateRackScore(cards) == 11 * 5 + GetRackoBonusAmount());
+    REQUIRE(p1.AddScore(CalculateRackScore(cards)) == 55 + GetRackoBonusAmount());
+    REQUIRE(p1.GetScore() == 55 + GetRackoBonusAmount());
 
 }
 
@@ -230,7 +230,7 @@ TEST_CASE_METHOD(TestRacko, "Racko game score calculation", "[Racko][RackoCard][
     }
 
     SECTION("One player turn") {
-        TestPlayer* p1 = new TestPlayer("Steve"); // {1,5,10,18,20,25,30,35,36,38,40,2,3,4,6 }
+        TestPlayer* p1 = new TestPlayer("Steve"); // {1,5,10,18,20,25,30,35,36,38,40,2,3,4,6 } 
         AddPlayer(p1);
         REQUIRE(GetPlayerCount() == 1);
 
@@ -251,7 +251,7 @@ TEST_CASE_METHOD(TestRacko, "Racko game score calculation", "[Racko][RackoCard][
         std::cout.rdbuf(oldOutput);
 
 
-        REQUIRE(GetPlayerByIdx(0)->GetCardVals() == std::vector({1,5,10,11,20,25,30,35,36,38,40,2,3,4,6 }));
+        REQUIRE(GetPlayerByIdx(0)->GetCardVals() == std::vector({11,5,10,18,20,25,30,35,36,38,40,2,3,4,6 }));
     }
 
 }
@@ -452,37 +452,37 @@ TEST_CASE_METHOD(TestRacko, "Racko difficulty and score goal settings",
                  "[Racko][Difficulty][ScoreGoal]") {
     SECTION("Direct score goals include boundaries and negative values") {
         SetScoreGoal(0);
-        REQUIRE(GetTestScoreGoal() == 0);
+        REQUIRE(GetScoreGoal() == 0);
 
         SetScoreGoal(150);
-        REQUIRE(GetTestScoreGoal() == 150);
+        REQUIRE(GetScoreGoal() == 150);
 
         SetScoreGoal(-1);
-        REQUIRE(GetTestScoreGoal() == -1);
+        REQUIRE(GetScoreGoal() == -1);
     }
 
     SECTION("Difficulty state and custom goal are stored") {
         SetCustomGoal(1);
-        REQUIRE(GetTestCustomGoal() == 1);
+        REQUIRE(GetCustomGoal() == 1);
         SetDifficulty(Difficulty::Easy);
-        REQUIRE(GetTestDifficulty() == 0);
+        REQUIRE(GetDifficulty() == 0);
         SetDifficulty(Difficulty::Custom);
-        REQUIRE(GetTestDifficulty() == 3);
+        REQUIRE(GetDifficulty() == 3);
     }
 
     SECTION("Preset difficulties select their documented score goals") {
         SetScoreGoal(Difficulty::Easy);
-        REQUIRE(GetTestScoreGoal() == 100);
+        REQUIRE(GetScoreGoal() == 100);
 
         SetScoreGoal(Difficulty::Medium);
-        REQUIRE(GetTestScoreGoal() == 150);
+        REQUIRE(GetScoreGoal() == 150);
 
         SetScoreGoal(Difficulty::Hard);
-        REQUIRE(GetTestScoreGoal() == 200);
+        REQUIRE(GetScoreGoal() == 200);
 
         SetCustomGoal(75);
         SetScoreGoal(Difficulty::Custom);
-        REQUIRE(GetTestScoreGoal() == 75);
+        REQUIRE(GetScoreGoal() == 75);
     }
 }
 
@@ -494,8 +494,8 @@ TEST_CASE_METHOD(TestRacko, "Racko difficulty selection handles invalid input",
     ChooseDifficulty();
 
     std::cin.rdbuf(oldInput);
-    REQUIRE(GetTestDifficulty() == 1);
-    REQUIRE(GetTestScoreGoal() == 150);
+    REQUIRE(GetDifficulty() == 1);
+    REQUIRE(GetScoreGoal() == 150);
 }
 
 TEST_CASE("RackoPlayer construction and center formatting", "[RackoPlayer]") {
@@ -528,7 +528,7 @@ TEST_CASE("RackoPlayer displays rack values and positions", "[RackoPlayer]") {
     REQUIRE(display.find(" 1  ") != std::string::npos);
     REQUIRE(display.find(" 10 ") != std::string::npos);
     REQUIRE(display.find(" 13 ") != std::string::npos);
-    REQUIRE(display.find(" 50 ") != std::string::npos);
+    REQUIRE(display.find(" 15 ") != std::string::npos);
     REQUIRE(display.find(" 5  ") != std::string::npos); 
     REQUIRE(display.find("10 ") != std::string::npos);
     REQUIRE(display.find('\n') != std::string::npos);
@@ -710,18 +710,20 @@ TEST_CASE_METHOD(TestRacko, "Racko scores valid player hands by index and name",
     TestPlayer* bravo = new TestPlayer("Bravo");
 
     alpha->ResetPlayer(false);
+    alpha->SetCards({1,2,3,4,5,6,7,8,9,10});
     bravo->ResetPlayer(false);
+    bravo->SetCards({1,4,6,9,14,16,17,48,49,52});
 
     AddPlayer(alpha);
     AddPlayer(bravo);
 
     REQUIRE(alpha->GetScore() == 0);
     ScoreRackByIdx(0);
-    REQUIRE(alpha->GetScore() == 55);
+    REQUIRE(alpha->GetScore() == (50 + GetRackoBonusAmount()));
 
     REQUIRE(bravo->GetScore() == 0);
     ScoreRackByName("Bravo");
-    REQUIRE(bravo->GetScore() == 55);
+    REQUIRE(bravo->GetScore() == (50 + GetRackoBonusAmount()));
 }
 
 TEST_CASE_METHOD(TestPlayer, "RackoPlayer centers text numbers", "[RackoPlayer][center]") {
@@ -768,12 +770,14 @@ TEST_CASE("Player keeps numCards synchronized", "[Player][numCards][GetNumCards]
     Card* replacedCard = (player.ReplaceCard(new Card(4, Suit::DIAMONDS), 0));
     REQUIRE(player.GetNumCards() == player.GetCards().size());
     REQUIRE(replacedCard->getValue() == 1);
+    REQUIRE(player.GetCardVals() == std::vector<int>({4,2,3}));
 
     Card* replacedCard2 = player.DiscardCard(0);
     REQUIRE(player.GetNumCards() == player.GetCards().size());
-    REQUIRE(replacedCard->getValue() == 2);    
+    REQUIRE(replacedCard2->getValue() == 4);    
 
     Card* replacedCard3 = player.DiscardRandomCard();
     REQUIRE(player.GetNumCards() == player.GetCards().size());
 
 }
+
