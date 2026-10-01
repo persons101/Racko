@@ -51,10 +51,11 @@ protected:
     virtual void AddStartingCardsToPlayer(Player*&);
     virtual char SelectDrawCard(int playerIdx) const;
     virtual char SelectDrawCard(Player*) const;
-    virtual int DrawCard(int playerIdx, bool);
-    virtual int DrawCard(Player*, bool);
-    virtual int SelectCardIdxToDiscard(int playerIdx);
-    virtual int SelectCardIdxToDiscard(Player*);
+    virtual Card* PopCard(bool);
+    virtual int DrawCardForPlayer(int playerIdx, bool);
+    virtual int DrawCardForPlayer(Player*, bool);
+    virtual int SelectCardIdxToDiscard(int playerIdx, const Card* cardToReplace = nullptr);
+    virtual int SelectCardIdxToDiscard(Player*, const Card* cardToReplace = nullptr);
     virtual int AddCardToDiscard(Card*);
     virtual int PlayTurnForPlayerByIdx(int playerIdx);
     virtual int PlayTurnForPlayerByName(std::string playerName);

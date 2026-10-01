@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <limits>
 
 // Helper function to return a center-padded string
 std::string RackoPlayer::center(const std::string &text, int width, char padding) const
@@ -69,24 +70,35 @@ bool RackoPlayer::IsCompletedWithRack()
 
 int RackoPlayer::SelectCardToReplace(const Card * cardToReplace) const
 {
+    if (cardToReplace == nullptr) {
+        return -1;
+    }
+
     int idx = -1;
     std::string input = "";
     std::cout << PrintCards() << "\n";
     std::cout << "Choose a card to remove for " << cardToReplace << " (e.g. '15'): ";
     do
     {
+        if (!(std::cin >> input)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
         try {
-            std::cin >> input;
-
-            idx = std::stoi(input); 
-            idx /= 5; // number -> index
-            idx--; // convert 1-indexed to 0-indexed
+            idx = stoi(input);
+            idx /= 5;   // Convert from score value idx to regular idx
+            idx--;      // 1-indexed -> 0-indexed
         }
         catch (const std::invalid_argument& e) {
             std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         } 
         catch (const std::out_of_range& e) {
             std::cerr << "Out of range: The value is too large or too small for an int." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
     } while (!(idx >= 0 && idx < (GetNumCards())));

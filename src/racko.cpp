@@ -33,7 +33,7 @@ int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
 void Racko::AddStartingCardsToPlayer(Player*& player)
 {
     for (int i = 0; i < 10; i++) {
-        DrawCard(player, false);        
+        player->DrawCard( PopCard(false) );        
     }
 }
 
@@ -82,17 +82,8 @@ char Racko::SelectDrawCard(Player * player) const
     return 'r';
 }
 
-int Racko::DrawCard(int playerIdx, bool isDiscardPileChosen)
+Card* Racko::PopCard(bool isDiscardPileChosen)
 {
-    return DrawCard(GetPlayerByIdx(playerIdx), isDiscardPileChosen);
-}
-
-int Racko::DrawCard(Player * player, bool isDiscardPileChosen)
-{
-    if (player == nullptr){
-        return -1;
-    }
-
     Card* card = nullptr;
     try {
         switch (isDiscardPileChosen) {
@@ -105,7 +96,7 @@ int Racko::DrawCard(Player * player, bool isDiscardPileChosen)
                 // draw from discard
                 // TODO create discardPile.h/.cpp to handle stack manipulation
                 if (discardPile.empty())
-                    return -4;
+                    return nullptr;
 
                 card = discardPile.top();
                 discardPile.pop();
@@ -121,57 +112,72 @@ int Racko::DrawCard(Player * player, bool isDiscardPileChosen)
     }
     catch (const std::out_of_range& e) {
         std::cerr << e.what() << std::endl;
-        return -2;
+        return nullptr;
     }
 
-    bool playerDrawStatus = player->DrawCard(card);
-
-    if (!playerDrawStatus) {
-        return -3;
-    }
-
-    return 0;
+    return card;
 }
 
-int Racko::SelectCardIdxToDiscard(int playerIdx)
+int Racko::DrawCardForPlayer(int playerIdx, bool isDiscardPileChosen) {
+    return DrawCardForPlayer(GetPlayerByIdx(playerIdx), isDiscardPileChosen);
+}
+    
+int Racko::DrawCardForPlayer(Player* player, bool isDiscardPileChosen) {
+    if (player == nullptr) {
+        return -1;
+    }
+
+    Card* cardToDraw = PopCard(isDiscardPileChosen);
+    player->DrawCard(cardToDraw);
+}
+
+int Racko::SelectCardIdxToDiscard(int playerIdx, const Card* cardToReplace)
 {
-    return SelectCardIdxToDiscard(GetPlayerByIdx(playerIdx));
+    return SelectCardIdxToDiscard(GetPlayerByIdx(playerIdx), cardToReplace);
 }
 
-int Racko::SelectCardIdxToDiscard(Player * player)
+int Racko::SelectCardIdxToDiscard(Player * player, const Card* cardToReplace)
 {
     if (player == nullptr) {
         return -1;
     }
 
-    std::cout << player->PrintCards();
-    std::cout << "Select card to discard using the # beneath it: ";
-
-    // input validation
-    std::string input = "";
-    int inputNum = -1;
-    while (!(inputNum % 5 == 0 && inputNum >= 5 && inputNum <= 50)) {
-        if (!(std::cin >> input)) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
-        }
-        try {
-            inputNum = stoi(input);
-        }
-        catch (const std::invalid_argument& e) {
-            std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        } 
-        catch (const std::out_of_range& e) {
-            std::cerr << "Out of range: The value is too large or too small for an int." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+    if (RackoPlayer* playerR = dynamic_cast<RackoPlayer*>(player) ) {
+        return playerR->SelectCardToReplace(cardToReplace);
     }
+    else {
+        std::string replaceStr = (cardToReplace != nullptr ? " for " + cardToReplace->PrintCardShort() : "");
 
-    return (inputNum / 5) - 1;
+        std::cout << player->PrintCards();
+        std::cout << "Select card to discard using the # beneath it" << replaceStr << ": ";
+
+        // input validation
+        std::string input = "";
+        int inputNum = -1;
+        while (!(inputNum % 5 == 0 && inputNum >= 5 && inputNum <= 50)) {
+            if (!(std::cin >> input)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                continue;
+            }
+            try {
+                inputNum = stoi(input);
+            }
+            catch (const std::invalid_argument& e) {
+                std::cerr << "Invalid argument: The string does not begin with a valid number. " << std::endl;
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            } 
+            catch (const std::out_of_range& e) {
+                std::cerr << "Out of range: The value is too large or too small for an int." << std::endl;
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+        }
+
+        return (inputNum / 5) - 1;
+    }
+    return -2;
 }
 
 int Racko::AddCardToDiscard(Card * cardToAdd)
@@ -220,34 +226,32 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
     // 6. check if complete
     // 7. if round over, score all players
 
-    // 1+2
-    char drawSelectionResult = SelectDrawCard(playerIdx);
-    
-    bool isDiscardPileChosen;
-    switch (drawSelectionResult) {
-        case 'r':
-            isDiscardPileChosen = false;
-            break;
-        case 'i':
-            isDiscardPileChosen = true;
-            break;
-        default:
-            return -3;
-    }
+    Card* cardDrawn = nullptr;
+    while (cardDrawn == nullptr) {
+        // 1+2
+        char drawSelectionResult = SelectDrawCard(playerIdx);
+        
+        bool isDiscardPileChosen;
+        switch (drawSelectionResult) {
+            case 'r':
+                isDiscardPileChosen = false;
+                break;
+            case 'i':
+                isDiscardPileChosen = true;
+                break;
+            default:
+                return -3;
+        }
 
-    // TODO Change 3-5 with RackoPlayer::ReplaceCard()
-    // 3
-    int drawStatus = DrawCard(playerIdx, isDiscardPileChosen);
-    if (drawStatus != 0) {
-        return -4;
+        // 3
+        cardDrawn = PopCard(isDiscardPileChosen);
     }
-
     // 4
-    int idxToReplace = SelectCardIdxToDiscard(player);
+    int idxToReplace = SelectCardIdxToDiscard(player, cardDrawn);
 
     // 5
-    int discardStatus = AddCardToDiscard(player->DiscardCard(idxToReplace));
-    if (drawStatus != 0) {
+    int discardStatus = AddCardToDiscard(player->ReplaceCard(cardDrawn, idxToReplace));
+    if (discardStatus != 0) {
         return -5;
     }
 

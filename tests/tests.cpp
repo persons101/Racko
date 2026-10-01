@@ -626,7 +626,7 @@ TEST_CASE("RackoPlayer selects a replacement card after invalid input", "[RackoP
     auto* oldInput = std::cin.rdbuf(input.rdbuf());
     auto* oldOutput = std::cout.rdbuf(output.rdbuf());
 
-    const int selected = player.SelectCardToReplace(nullptr);
+    const int selected = player.SelectCardToReplace(new Card(35, Suit::DIAMONDS));
 
     std::cin.rdbuf(oldInput);
     std::cout.rdbuf(oldOutput);
