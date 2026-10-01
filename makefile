@@ -70,7 +70,7 @@ testsWithCoverage: $(TEST_OBJECTS) $(CATCH_OBJECT) | $(TEST_DIR)/$(OBJ_DIR) $(OB
 coverage: clean
 	$(MAKE) buildWithCoverage
 	$(MAKE) testsWithCoverage
-	./$(BIN_DIR)/testsCoverage.exe
+	./$(BIN_DIR)/testsWithCoverage.exe
 
 clean:
 	rm -rf $(OBJ_DIR)/*.o
