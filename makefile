@@ -16,14 +16,15 @@ TEST_ROOT_SOURCES := $(wildcard $(TEST_DIR)/*.cpp)
 TEST_SRC_SOURCES := $(wildcard $(TEST_DIR)/$(SRC_DIR)/*.cpp)
 
 CATCH_SOURCE := $(TEST_DIR)/catch_amalgamated.cpp
-CATCH_OBJECT := $(TEST_DIR)/catch_amalgamated.hpp
+CATCH_OBJECT := $(TEST_DIR)/$(OBJ_DIR)/catch_amalgamated.o
 # Generate corresponding object file names in the object directory
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SOURCES))
 
 TEST_ROOT_OBJECTS := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_DIR)/$(OBJ_DIR)/%.o,$(TEST_ROOT_SOURCES))
+TEST_ROOT_OBJECTS := $(filter-out $(CATCH_OBJECT), $(TEST_ROOT_OBJECTS))
 TEST_SRC_OBJECTS := $(patsubst $(TEST_DIR)/$(SRC_DIR)/%.cpp,$(TEST_DIR)/$(OBJ_DIR)/%.o,$(TEST_SRC_SOURCES))
 
-TEST_OBJECTS := $(filter-out $(OBJ_DIR)/main.o $(CATCH_OBJECT), $(OBJECTS))
+TEST_OBJECTS := $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
 TEST_OBJECTS += $(TEST_ROOT_OBJECTS) $(TEST_SRC_OBJECTS)
 
 
