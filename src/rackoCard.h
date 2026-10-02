@@ -6,7 +6,8 @@
 class RackoCard : public Card {
 public:
     RackoCard(int cardVal);
-    RackoCard(Card card);
+    RackoCard(const Card& card);
+    virtual Card* getCopy() const override;
     virtual std::string getSuitSymbol() const override;
     virtual std::string PrintCard() const override;
     virtual std::string PrintCardShort() const override;

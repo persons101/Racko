@@ -5,9 +5,10 @@
 
 RackoDeck::RackoDeck() : Deck(0, 0, 0) { 
     AddCardsToDeck(60, 1);
+    Shuffle();
 }
 
-void RackoDeck::PrintDeck() const
+std::string RackoDeck::PrintDeck() const
 {
     std::cout << "---Start Deck---\n";
     for (const auto& card : GetCards()) {

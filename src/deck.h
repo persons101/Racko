@@ -18,12 +18,13 @@ protected:
     std::vector<Card*> deck;
     virtual Card* MakeNewCard(int, Suit);
     virtual Card* MakeNewCard(Card*);
+    virtual void AddCardToDeck(Card*);
     virtual void AddCardsToDeck(int numCardsPerSuit, int numSuits);
     virtual void AddJokersToDeck(int numJokers);
 
 public:
     Deck();
-    ~Deck();
+    virtual ~Deck();
     Deck(int numCardsPerSuit, int numSuits);
     Deck(int numCardsPerSuit, int numSuits, int numJokers);
     void Shuffle();
@@ -33,7 +34,7 @@ public:
     Card* GetBottomCard() const;
     int GetNumCards() const { return numCards; }
     std::vector<Card*> GetCards() const { return deck; }
-    virtual void PrintDeck() const;
+    virtual std::string PrintDeck() const;
 };
 
 

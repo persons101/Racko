@@ -15,13 +15,16 @@ CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
 TEST_ROOT_SOURCES := $(wildcard $(TEST_DIR)/*.cpp)
 TEST_SRC_SOURCES := $(wildcard $(TEST_DIR)/$(SRC_DIR)/*.cpp)
 
+CATCH_SOURCE := $(TEST_DIR)/catch_amalgamated.cpp
+CATCH_OBJECT := $(TEST_DIR)/$(OBJ_DIR)/catch_amalgamated.o
 # Generate corresponding object file names in the object directory
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SOURCES))
 
 TEST_ROOT_OBJECTS := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_DIR)/$(OBJ_DIR)/%.o,$(TEST_ROOT_SOURCES))
+TEST_ROOT_OBJECTS := $(filter-out $(CATCH_OBJECT), $(TEST_ROOT_OBJECTS))
 TEST_SRC_OBJECTS := $(patsubst $(TEST_DIR)/$(SRC_DIR)/%.cpp,$(TEST_DIR)/$(OBJ_DIR)/%.o,$(TEST_SRC_SOURCES))
 
-TEST_OBJECTS := $(filter-out $(OBJ_DIR)/main.o,$(OBJECTS))
+TEST_OBJECTS := $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
 TEST_OBJECTS += $(TEST_ROOT_OBJECTS) $(TEST_SRC_OBJECTS)
 
 
@@ -55,20 +58,22 @@ buildWithCoverage: CXXFLAGS += $(COVERAGEFLAGS)
 buildWithCoverage: $(OBJECTS) | $(BIN_DIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $^ -o $(BIN_DIR)/RackoCoverage.exe
 
-tests: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
+tests: $(TEST_OBJECTS) $(CATCH_OBJECT)| $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(DEBUG) $(TESTFLAGS) $^ -o $(BIN_DIR)/$@.exe
 	./$(BIN_DIR)/$@.exe
 
 testsWithCoverage: CXXFLAGS += $(COVERAGEFLAGS)
-testsWithCoverage: $(TEST_OBJECTS) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(TESTFLAGS) $^ -o $(BIN_DIR)/testsCoverage.exe
+testsWithCoverage: $(TEST_OBJECTS) $(CATCH_OBJECT) | $(TEST_DIR)/$(OBJ_DIR) $(OBJ_DIR) $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(DEBUG) $(TESTFLAGS) $^ -o $(BIN_DIR)/$@.exe
 	./$(BIN_DIR)/$@.exe
 
 coverage: clean
 	$(MAKE) buildWithCoverage
 	$(MAKE) testsWithCoverage
-	./$(BIN_DIR)/testsCoverage.exe
+	./$(BIN_DIR)/testsWithCoverage.exe
 
 clean:
 	rm -rf $(OBJ_DIR)/*.o
-	rm -rf $(TEST_DIR)/$(OBJ_DIR)/*.o
+	rm -rf $(TEST_ROOT_OBJECTS)
+	rm -rf $(TEST_SRC_OBJECTS)
+# 	not catch_amalgamated.o

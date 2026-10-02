@@ -22,6 +22,9 @@ private:
 public:
     Card(int, Suit);
     Card(std::tuple<int, Suit>);
+    virtual ~Card() = default;
+    virtual Card* getCopy() const; 
+
     int getValue() const;
     virtual char getValueChar() const;
     virtual std::string getValueString() const;
@@ -44,6 +47,8 @@ public:
                           virtual bool operator() (const Card, const std::tuple<int,Suit>) const; 
                           virtual bool operator() (const Card*, const std::tuple<int,Suit>) const; 
                         };
+
+    friend std::ostream& operator<<(std::ostream& os, const Card&);
 };
 
 #endif

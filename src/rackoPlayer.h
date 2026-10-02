@@ -10,7 +10,7 @@ public:
     RackoPlayer(std::string);
 
 	Card* DiscardCard(int cardPos, Suit suit = (Suit)0) override;
-    virtual std::string DisplayCardsInRack() const;
+    virtual std::string PrintCards() const override;
     virtual bool IsCompletedWithRack();
     int SelectCardToReplace(const Card*) const;
     Card* ReplaceCard(Card*, int pos);

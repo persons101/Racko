@@ -3,7 +3,7 @@
 
 #include "../../src/rackoPlayer.h"
 
-#include <set>
+#include <vector>
 
 class TestPlayer : public RackoPlayer {
 protected:
@@ -12,7 +12,10 @@ public:
     using RackoPlayer::center;
     TestPlayer();
     TestPlayer(std::string);
-    std::set<int> static GetTestCardVals();
+    void SetCards(const std::vector<Card*>&);
+    void SetCards(const std::vector<int>&);
+    void ClearCards();
+    std::vector<int> static GetTestCardVals();
 };
 
 #endif
