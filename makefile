@@ -2,13 +2,21 @@ SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 TEST_DIR = tests
+SCRIPT_DIR = scripts
 
 CXX ?= g++
+PYTHON ?= python
+LCOV ?= lcov
+GENHTML ?= genhtml
 CXXFLAGS = -Wall -Wextra -std=c++17 -O2 -fdiagnostics-color=always
 DEBUG = 
 COVERAGEFLAGS = -O0 --coverage
+COVERAGE_INFO ?= coverage.info
+COVERAGE_HTML_DIR ?= $(BIN_DIR)/coverage_html
+COVERAGE_SINGLE_HTML ?= html_coverage/report.html
+COVERAGE_EXCLUDE ?= *msys64*
 
-.PHONY: all build buildWithCoverage tests testsWithCoverage coverage clean
+.PHONY: all build buildWithCoverage tests testsWithCoverage coverage coverageSingleHTML clean
 
 # Find all C++ source files
 CPP_SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -72,8 +80,16 @@ coverage: clean
 	$(MAKE) testsWithCoverage
 	./$(BIN_DIR)/testsWithCoverage.exe
 
+coverageSingleHTML: coverage | $(BIN_DIR)
+	$(LCOV) --remove $(COVERAGE_INFO) "$(COVERAGE_EXCLUDE)" --output-file $(BIN_DIR)/coverage-filtered.info
+	$(GENHTML) $(BIN_DIR)/coverage-filtered.info --output-directory $(COVERAGE_HTML_DIR)
+	$(PYTHON) $(SCRIPT_DIR)/bundle_coverage.py $(COVERAGE_HTML_DIR) --output $(COVERAGE_SINGLE_HTML)
+	$(MAKE) cleanHTML
+
 clean:
-	rm -rf $(OBJ_DIR)/*.o
-	rm -rf $(TEST_ROOT_OBJECTS)
-	rm -rf $(TEST_SRC_OBJECTS)
-# 	not catch_amalgamated.o
+	rm -rf $(OBJ_DIR)/*
+	rm -rf $(TEST_DIR)/$(OBJ_DIR)/*
+
+cleanHTML:
+	rm -rf $(SRC_DIR)/*.html
+	rm -rf $(TEST_DIR)/*.html
