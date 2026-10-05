@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "card.h"
+#include "helper.hpp"
 
 RackoDeck::RackoDeck() : Deck(0, 0, 0) { 
     AddCardsToDeck(60, 1);
@@ -10,12 +11,16 @@ RackoDeck::RackoDeck() : Deck(0, 0, 0) {
 
 std::string RackoDeck::PrintDeck() const
 {
-    std::cout << "---Start Deck---\n";
+    std::string returnStr = "";
+    returnStr += "---Start Deck---\n";
     for (const auto& card : GetCards()) {
-        card->PrintCardShort();
+        returnStr += card->PrintCardShort() + " ";
     }
-    std::cout << "\n";
-    std::cout << "--- End Deck ---\n";
+    Helper::rtrim(returnStr);
+    returnStr += "\n";
+    returnStr += "--- End Deck ---\n";
+
+    return returnStr;
 }
 
 Card* RackoDeck::MakeNewCard(int cardVal, Suit cardSuit) {

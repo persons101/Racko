@@ -195,8 +195,8 @@ int Racko::GetPlayerIdxByName(std::string playerName) const
 
     std::vector<Player*>::iterator it;
 
-    int i = 0;
-    for (i; i < playerCnt; i++) {
+    unsigned int i = 0;
+    for (/*i*/; i < playerCnt; i++) {
         currPlayer = playerVector.at(i);
         if (currPlayer->GetName() == playerName)
             break;
@@ -491,7 +491,7 @@ void Racko::SetupGame()
         }
     } while (numPlayersToAdd <= 0);
 
-    for (std::size_t i = 0; i < numPlayersToAdd; i++) {
+    for (int i = 0; i < numPlayersToAdd; i++) {
         Player* player = CreatePlayer();
         AddStartingCardsToPlayer(player);
         AddPlayer(player);
@@ -589,18 +589,18 @@ void Racko::PlayTurn()
 {
     bool isRoundOver = false;
     numTurns++;
-    for (int i = 0; i < playerVector.size() && !isRoundOver; i++) {
+    for (std::size_t i = 0; i < playerVector.size() && !isRoundOver; i++) {
         PrintTurnNum();
         PrintPlayerDetails(GetPlayerByIdx(i));
         // score is returned for possible subclasses/accessors, but value is not used in this implementation.
         int playerScore = PlayTurnForPlayerByIdx(i); 
 
         if (playerScore < 0) {
-            std::cerr << ">>> Error in PlayTurnForPlayerByIdx() for player " << i << "\n";
+            std::cerr << ">>> Error " << playerScore << " in PlayTurnForPlayerByIdx() for player " << i << "\n";
         }
         else if (playerScore > 0) {
             isRoundOver = true;
-            for (int j = 0; j < playerVector.size(); j++) {
+            for (std::size_t j = 0; j < playerVector.size(); j++) {
                 ScoreRackByIdx(j);
             }
         }
