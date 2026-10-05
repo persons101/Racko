@@ -780,3 +780,97 @@ TEST_CASE("Player keeps numCards synchronized", "[Player][numCards][GetNumCards]
 
 }
 
+TEST_CASE_METHOD(TestRacko, "Racko draws cards from the deck and discard pile",
+                 "[Racko][DrawCardForPlayer]") {
+    TestPlayer player("Draw");
+    player.ClearCards();
+    deck = std::make_unique<TestDeck>();
+
+    REQUIRE(DrawCardForPlayer(nullptr, false) == -1);
+    REQUIRE(DrawCardForPlayer(&player, false) == 0);
+    REQUIRE(player.GetCardVals() == std::vector<int>{11});
+    REQUIRE(GetDeckCardCount() == 59);
+
+    AddCardToDiscard(new Card(42, Suit::HEARTS));
+    REQUIRE(DrawCardForPlayer(&player, true) == 0);
+    REQUIRE(player.GetCardVals() == std::vector<int>{11, 42});
+    REQUIRE(GetDiscardCardCount() == 0);
+
+    REQUIRE(DrawCardForPlayer(&player, true) == 1);
+    REQUIRE(player.GetNumCards() == 2);
+
+    auto* indexedPlayer = new TestPlayer("Indexed");
+    indexedPlayer->ClearCards();
+    AddPlayer(indexedPlayer);
+    deck = std::make_unique<TestDeck>();
+
+    REQUIRE(DrawCardForPlayer(-1, false) == -1);
+    REQUIRE(DrawCardForPlayer(0, false) == 0);
+    REQUIRE(indexedPlayer->GetCardVals() == std::vector<int>{11});
+    REQUIRE(GetDeckCardCount() == 59);
+    ResetPlayers();
+}
+
+TEST_CASE_METHOD(TestRacko, "Racko finds player indexes by name",
+                 "[Racko][GetPlayerIdxByName]") {
+    AddPlayer("Alpha");
+    AddPlayer("Bravo");
+    AddPlayer("Alpha");
+    AddPlayer("");
+
+    REQUIRE(GetPlayerIdxByName("Alpha") == 0);
+    REQUIRE(GetPlayerIdxByName("Bravo") == 1);
+    REQUIRE(GetPlayerIdxByName("") == 3);
+
+    ResetPlayers();
+}
+
+TEST_CASE_METHOD(TestRacko, "Racko resets the player collection",
+                 "[Racko][ResetPlayers]") {
+    AddPlayer("Alpha");
+    AddPlayer("Bravo");
+    REQUIRE(GetPlayerCount() == 2);
+
+    ResetPlayers();
+    REQUIRE(GetPlayerCount() == 0);
+
+    ResetPlayers();
+    REQUIRE(GetPlayerCount() == 0);
+}
+
+TEST_CASE_METHOD(TestRacko, "Racko reports an empty deck during a named player turn",
+                 "[Racko][PlayTurnForPlayerByName]") {
+    auto* player = new TestPlayer("Alpha");
+    player->SetCards(std::vector<int>{1, 5, 10});
+    AddPlayer(player);
+    deck = std::make_unique<TestDeck>(std::unordered_set<int>{});
+
+    const int result = PlayTurnForPlayerByName("Alpha");
+
+    REQUIRE(result == -3);
+    REQUIRE(player->GetCardVals() == std::vector<int>{1, 5, 10});
+    ResetPlayers();
+}
+
+TEST_CASE_METHOD(TestRacko, "Racko resets game state and optionally keeps players",
+                 "[Racko][ResetGame]") {
+    PlayTurn();
+    REQUIRE(GetNumTurns() == 1);
+
+    AddPlayer("Kept");
+    Card discardedCard(42, Suit::HEARTS);
+    AddCardToDiscard(&discardedCard);
+
+    ResetGame(true);
+    REQUIRE(GetNumTurns() == 0);
+    REQUIRE(GetDeckCardCount() == 60);
+    REQUIRE(GetDiscardCardCount() == 0);
+    REQUIRE(GetPlayerCount() == 1);
+    REQUIRE(GetPlayerByIdx(0)->GetName() == "Kept");
+
+    ResetGame();
+    REQUIRE(GetNumTurns() == 0);
+    REQUIRE(GetDeckCardCount() == 60);
+    REQUIRE(GetDiscardCardCount() == 0);
+    REQUIRE(GetPlayerCount() == 0);
+}
