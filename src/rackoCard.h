@@ -11,6 +11,7 @@ public:
     virtual std::string getSuitSymbol() const override;
     virtual std::string PrintCard() const override;
     virtual std::string PrintCardShort() const override;
+    friend std::ostream& operator<<(std::ostream& os, const RackoCard&);
 };
 
 #endif

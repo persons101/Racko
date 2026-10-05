@@ -83,12 +83,14 @@ public:
     void ScoreRackByIdx(int playerIdx);
     void ScoreRackByName(std::string playerName);
     
+    virtual void PrintTurnNum();
+    virtual void PrintPlayerDetails(Player*);
+
     virtual void SetupGame();
     virtual Player* CreatePlayer();
     virtual void ChooseDifficulty();
     virtual int Run();
     virtual void PlayTurn();
-    virtual void PrintTurnNum();
     virtual int CheckForWinners();
     virtual int FinishGame();
     virtual void ResetGame(bool keepPlayers = false);

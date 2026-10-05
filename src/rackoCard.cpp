@@ -21,3 +21,9 @@ std::string RackoCard::PrintCard() const {
 std::string RackoCard::PrintCardShort() const {
     return std::to_string(this->getValue());
 } 
+
+std::ostream &operator<<(std::ostream& os, const RackoCard & card)
+{
+    os << card.PrintCardShort();
+    return os;
+}

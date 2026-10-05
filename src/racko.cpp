@@ -128,7 +128,7 @@ int Racko::DrawCardForPlayer(Player* player, bool isDiscardPileChosen) {
     }
 
     Card* cardToDraw = PopCard(isDiscardPileChosen);
-    player->DrawCard(cardToDraw);
+    return int(player->DrawCard(cardToDraw)) * -1 + 1;
 }
 
 int Racko::SelectCardIdxToDiscard(int playerIdx, const Card* cardToReplace)
@@ -588,9 +588,10 @@ void Racko::ChooseDifficulty()
 void Racko::PlayTurn()
 {
     bool isRoundOver = false;
+    numTurns++;
     for (int i = 0; i < playerVector.size() && !isRoundOver; i++) {
         PrintTurnNum();
-        
+        PrintPlayerDetails(GetPlayerByIdx(i));
         // score is returned for possible subclasses/accessors, but value is not used in this implementation.
         int playerScore = PlayTurnForPlayerByIdx(i); 
 
@@ -609,6 +610,11 @@ void Racko::PlayTurn()
 void Racko::PrintTurnNum()
 {
     std::cout << ("Round " + std::to_string(numTurns) + "\n");
+}
+
+void Racko::PrintPlayerDetails(Player * player)
+{
+    std::cout << player->GetName() << ": " << player->GetScore() << " points\n";
 }
 
 int Racko::CheckForWinners()
