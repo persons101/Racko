@@ -250,8 +250,9 @@ int Racko::PlayTurnForPlayerByIdx(int playerIdx)
     int idxToReplace = SelectCardIdxToDiscard(player, cardDrawn);
 
     // 5
-    int discardStatus = AddCardToDiscard(player->ReplaceCard(cardDrawn, idxToReplace));
-    if (discardStatus != 0) {
+    int cardsInDiscardBefore = GetDiscardCardCount();
+    int cardsInDiscard = AddCardToDiscard(player->ReplaceCard(cardDrawn, idxToReplace));
+    if (cardsInDiscardBefore == cardsInDiscard) {
         return -5;
     }
 
@@ -633,12 +634,12 @@ int Racko::FinishGame()
     Player* pSecond = nullptr;
     Player* pThird = nullptr;
     Player* pLast = nullptr;
-    char playAgainChar;
+    char playAgainChar = '\0';
 
     for (Player* player : playerVector) {
         int currPlayerScore = player->GetScore();
         if (pFirst == nullptr) {
-            player = pFirst;
+            pFirst = player;
         }
         else if (pFirst->GetScore() < currPlayerScore) {
             if (pSecond == nullptr) {
