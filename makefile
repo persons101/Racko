@@ -92,4 +92,4 @@ clean:
 
 cleanHTML:
 	rm -rf $(SRC_DIR)/*.html
-	rm -rf $(TEST_DIR)/*.html
+	rm -rf $(TEST_DIR)/*/*.html
