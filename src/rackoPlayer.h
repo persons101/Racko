@@ -14,4 +14,14 @@ public:
     virtual bool IsCompletedWithRack();
     int SelectCardToReplace(const Card*) const;
     Card* ReplaceCard(Card*, int pos);
+
+    /// @brief Sorts by score, then alphabetical
+    /// @param other Player to compare to
+    /// @return True if current player score is less than other score, or if equal true if name is earlier alphabetically 
+    bool operator<(const RackoPlayer& other) {
+        if (this->GetScore() != other.GetScore()) {
+            return this->name < other.name;
+        }
+        return this->GetScore() < other.GetScore();
+    }
 };

@@ -628,54 +628,71 @@ int Racko::CheckForWinners()
     return -1;
 }
 
+Player* Racko::PlacementForLarger(Player*& currentlyPlacedPlayer, Player* otherPlayer, bool arrDescending = false) {
+    if (currentlyPlacedPlayer == nullptr) {
+        currentlyPlacedPlayer = otherPlayer;
+        return nullptr;
+    }
+
+    Player* temp = nullptr;
+
+    int currentScore = currentlyPlacedPlayer->GetScore();
+    int otherScore = otherPlayer->GetScore();
+    bool isOtherLarger = otherScore > currentScore;
+
+    if (arrDescending) {
+        if (!isOtherLarger) {
+            // move
+            temp = currentlyPlacedPlayer;
+            currentlyPlacedPlayer = otherPlayer;
+            otherPlayer = temp;
+        }
+    }
+    else {
+        if (isOtherLarger) {
+            // move
+            temp = currentlyPlacedPlayer;
+            currentlyPlacedPlayer = otherPlayer;
+            otherPlayer = temp;
+        }
+    }
+
+    return otherPlayer;
+}
+
 int Racko::FinishGame()
 {
-    Player* pFirst = nullptr;
-    Player* pSecond = nullptr;
-    Player* pThird = nullptr;
-    Player* pLast = nullptr;
     char playAgainChar = '\0';
+    if (playerVector.size() > 0) {
+        Player* pFirst = nullptr;
+        Player* pSecond = nullptr;
+        Player* pThird = nullptr;
+        Player* pLast = nullptr;
+        Player* notPlacedPlayer = nullptr;
 
-    for (Player* player : playerVector) {
-        int currPlayerScore = player->GetScore();
-        if (pFirst == nullptr) {
-            pFirst = player;
-        }
-        else if (pFirst->GetScore() < currPlayerScore) {
-            if (pSecond == nullptr) {
-                pSecond = pFirst;
-                pFirst = player;
-            }
-            else {
-                if (pSecond->GetScore() < currPlayerScore) {
-                    pThird = pSecond;
-                    pSecond = player;
-                }
-                else if (pThird) {
-                    if (pThird->GetScore() < currPlayerScore) {
-                        pThird = player;
-                    }
-                }
-                
-            }
+        for (Player* player : playerVector) {
+            notPlacedPlayer = PlacementForLarger(pFirst, player);
+            notPlacedPlayer = PlacementForLarger(pSecond, notPlacedPlayer);
+            notPlacedPlayer = PlacementForLarger(pThird, notPlacedPlayer); // notPlacedPlayer left for scaling purposes
+            
+            notPlacedPlayer = player;
+            PlacementForLarger(pLast, notPlacedPlayer, true);
         }
 
-        if ( pLast == nullptr || pLast->GetScore() > currPlayerScore) {
-            pLast = player;
+        std::cout << "--------------------------------------\n";
+        std::cout << "First Place: " << (pFirst ? pFirst->GetName() : "") << "\n";
+        if (playerCnt > 1) {
+            std::cout << "Second Place: " << (pSecond ? pSecond->GetName() : "") << "\n";
+            if (playerCnt > 2) {
+                std::cout << "Third Place: " << (pThird ? pThird->GetName() : "") << "\n";
+                if (playerCnt > 3) {
+                    std::cout << "Last Place: " << (pLast ? pLast->GetName() : "") << "\n";
+                }
+            }
         }
     }
 
-    std::cout << "--------------------------------------\n";
-    std::cout << "First Place: " << (pFirst ? pFirst->GetName() : "") << "\n";
-    if (playerCnt > 1) {
-        std::cout << "Second Place: " << (pSecond ? pSecond->GetName() : "") << "\n";
-        if (playerCnt > 2) {
-            std::cout << "Third Place: " << (pThird ? pThird->GetName() : "") << "\n";
-            if (playerCnt > 3) {
-                std::cout << "Last Place: " << (pLast ? pLast->GetName() : "") << "\n";
-            }
-        }
-    }
+    
 
     std::cout << "\n\nWould you like to play again? (Y/N) ";
     while (playAgainChar != 'y' && playAgainChar != 'n') {

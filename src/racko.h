@@ -64,6 +64,14 @@ protected:
     virtual void AddPlayer(std::string);
     virtual void AddPlayer(Player*);
 
+       
+/// @brief Compares a players' score to a currently placed (top 3 / last) player, swapping them if better
+/// @param currentlyPlacedPlayer A player that exists in the top 3 / last (e.g. pFirst)
+/// @param otherPlayer A player compared to the placement
+/// @param arrDescending Used for last placement: places the smaller score in the placement
+/// @return Returns the player that does not end in the placement
+    Player* PlacementForLarger(Player *&currentlyPlacedPlayer, Player *otherPlayer, bool arrDescending);
+
 public:
     Racko();
 
