@@ -1091,8 +1091,9 @@ TEST_CASE_METHOD(TestRacko, "FinishGame reports rankings and handles play-again 
         }
 
         REQUIRE(result == 0);
-        REQUIRE(output.str().find("First Place: \n") != std::string::npos);
+        REQUIRE(output.str().find("First Place: \n") == std::string::npos);
         REQUIRE(output.str().find("Second Place:") == std::string::npos);
+        REQUIRE(output.str().find("Third Place: ") == std::string::npos);
     }
 
     SECTION("One player can choose to play again after an invalid response") {
