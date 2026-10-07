@@ -6,8 +6,10 @@ public:
     using Racko::ChooseDifficulty;
     using Racko::DrawCardForPlayer;
     using Racko::GetPlayerIdxByName;
+    using Racko::PlayTurnForPlayerByIdx;
     using Racko::PlayTurnForPlayerByName;
     using Racko::ResetPlayers;
+    using Racko::SelectDrawCard;
     using Racko::SetCustomGoal;
     using Racko::SetDifficulty;
     using Racko::SetScoreGoal;

@@ -1,6 +1,7 @@
 #include "catch_amalgamated.hpp"
 
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include "../src/card.h"
@@ -12,6 +13,22 @@
 #include "src/testDeck.h"
 #include "src/testPlayer.h"
 #include "src/testRacko.h"
+
+class ScopedStreamRedirect {
+public:
+    ScopedStreamRedirect(std::istream& replacementInput, std::ostream& replacementOutput)
+        : oldInput(std::cin.rdbuf(replacementInput.rdbuf())),
+          oldOutput(std::cout.rdbuf(replacementOutput.rdbuf())) {}
+
+    ~ScopedStreamRedirect() {
+        std::cin.rdbuf(oldInput);
+        std::cout.rdbuf(oldOutput);
+    }
+
+private:
+    std::streambuf* oldInput;
+    std::streambuf* oldOutput;
+};
 
 
 TEST_CASE("Testing Suit to string", "[Suit],[suit_name]"){
@@ -843,13 +860,12 @@ TEST_CASE_METHOD(TestRacko, "Racko reports an empty deck during a named player t
     auto* player = new TestPlayer("Alpha");
     player->SetCards(std::vector<int>{1, 5, 10});
     AddPlayer(player);
-    deck = std::make_unique<TestDeck>(std::unordered_set<int>{});
+    deck = std::make_unique<Deck>(0, 0);
 
     const int result = PlayTurnForPlayerByName("Alpha");
 
     REQUIRE(result == -3);
     REQUIRE(player->GetCardVals() == std::vector<int>{1, 5, 10});
-    ResetPlayers();
 }
 
 TEST_CASE_METHOD(TestRacko, "Racko resets game state and optionally keeps players",
@@ -873,4 +889,306 @@ TEST_CASE_METHOD(TestRacko, "Racko resets game state and optionally keeps player
     REQUIRE(GetDeckCardCount() == 60);
     REQUIRE(GetDiscardCardCount() == 0);
     REQUIRE(GetPlayerCount() == 0);
+}
+
+TEST_CASE("RackoDeck prints its full Racko card range", "[RackoDeck][PrintDeck]") {
+    RackoDeck deck;
+    const std::string printedDeck = deck.PrintDeck();
+
+    REQUIRE(printedDeck.find("---Start Deck---\n") == 0);
+    REQUIRE(printedDeck.find("\n--- End Deck ---\n") != std::string::npos);
+
+    const std::size_t cardsStart = printedDeck.find('\n') + 1;
+    const std::size_t cardsEnd = printedDeck.find("\n--- End Deck ---");
+    std::istringstream cardsStream(printedDeck.substr(cardsStart, cardsEnd - cardsStart));
+    std::set<int> cardValues;
+    int cardValue = 0;
+    while (cardsStream >> cardValue) {
+        cardValues.insert(cardValue);
+    }
+
+    REQUIRE(cardValues.size() == 60);
+    REQUIRE(*cardValues.begin() == 1);
+    REQUIRE(*cardValues.rbegin() == 60);
+}
+
+TEST_CASE("Player stores named and empty names", "[Player][GetName]") {
+    Player namedPlayer("Kathy");
+    Player emptyNamePlayer("");
+
+    REQUIRE(namedPlayer.GetName() == "Kathy");
+    REQUIRE(emptyNamePlayer.GetName().empty());
+}
+
+TEST_CASE_METHOD(TestRacko, "SelectDrawCard accepts a Player pointer",
+                 "[Racko][SelectDrawCard]") {
+    TestPlayer player("Alex");
+
+    SECTION("Null players and an empty deck return an error") {
+        REQUIRE(SelectDrawCard(static_cast<Player*>(nullptr)) == 'e');
+
+        deck = std::make_unique<TestDeck>(std::unordered_set<int>{});
+        REQUIRE(SelectDrawCard(&player) == 'e');
+    }
+
+    SECTION("A player can choose the deck") {
+        std::istringstream input("0\n");
+        std::ostringstream output;
+        auto* oldInput = std::cin.rdbuf(input.rdbuf());
+        auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+        const char result = SelectDrawCard(&player);
+
+        std::cin.rdbuf(oldInput);
+        std::cout.rdbuf(oldOutput);
+
+        REQUIRE(result == 'r');
+        REQUIRE(output.str().find("Choose a card") != std::string::npos);
+    }
+
+    SECTION("A player can choose a populated discard pile") {
+        Card discardCard(25, Suit::CLUBS);
+        discardPile.push(&discardCard);
+
+        std::istringstream input("1\n");
+        std::ostringstream output;
+        auto* oldInput = std::cin.rdbuf(input.rdbuf());
+        auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+        const char result = SelectDrawCard(&player);
+
+        std::cin.rdbuf(oldInput);
+        std::cout.rdbuf(oldOutput);
+
+        REQUIRE(result == 'i');
+        REQUIRE(output.str().find("25") != std::string::npos);
+    }
+
+    SECTION("An empty discard pile rejects that choice before accepting the deck") {
+        std::istringstream input("1\n0\n");
+        std::ostringstream output;
+        auto* oldInput = std::cin.rdbuf(input.rdbuf());
+        auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+        const char result = SelectDrawCard(&player);
+
+        std::cin.rdbuf(oldInput);
+        std::cout.rdbuf(oldOutput);
+
+        REQUIRE(result == 'r');
+        REQUIRE(output.str().find("no cards in the discard pile") != std::string::npos);
+    }
+}
+
+TEST_CASE_METHOD(TestRacko, "Racko setup initializes players and difficulty",
+                 "[Racko][SetupGame]") {
+    std::istringstream input("1\nSolo\n2\n");
+    std::ostringstream output;
+    auto* oldInput = std::cin.rdbuf(input.rdbuf());
+    auto* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    Racko::SetupGame();
+
+    std::cin.rdbuf(oldInput);
+    std::cout.rdbuf(oldOutput);
+
+    REQUIRE(GetNumGames() == 1);
+    REQUIRE(GetNumTurns() == 0);
+    REQUIRE(GetPlayerCount() == 1);
+    REQUIRE(GetPlayerByIdx(0)->GetName() == "Solo");
+    REQUIRE(GetPlayerByIdx(0)->GetNumCards() == 10);
+    REQUIRE(GetDeckCardCount() == 50);
+    REQUIRE(GetDiscardCardCount() == 0);
+    REQUIRE(GetScoreGoal() == 150);
+}
+
+TEST_CASE_METHOD(TestRacko, "PlayTurnForPlayerByIdx replaces a card and reports rack completion",
+                 "[Racko][PlayTurnForPlayerByIdx]") {
+    SECTION("A non-winning replacement is discarded and returns zero") {
+        auto* player = new TestPlayer("Alpha");
+        player->SetCards(std::vector<int>{2, 4, 6, 8, 10, 12, 14, 16, 18, 20});
+        AddPlayer(player);
+        deck = std::make_unique<Deck>(1, 1);
+
+        std::istringstream input("0\n30\n");
+        std::ostringstream output;
+        int result = -1;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = PlayTurnForPlayerByIdx(0);
+        }
+
+        REQUIRE(result == 0);
+        REQUIRE(player->GetCardVals() == std::vector<int>{2, 4, 6, 8, 10, 1, 14, 16, 18, 20});
+        REQUIRE(GetDiscardCardCount() == 1);
+        REQUIRE(GetTopCardFromDiscard()->getValue() == 12);
+        ResetPlayers();
+    }
+
+    SECTION("A replacement completing an ascending rack returns its rack score") {
+        auto* player = new TestPlayer("Alpha");
+        player->SetCards(std::vector<int>{2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
+        AddPlayer(player);
+        deck = std::make_unique<Deck>(1, 1);
+
+        std::istringstream input("0\n5\n");
+        std::ostringstream output;
+        int result = 0;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = PlayTurnForPlayerByIdx(0);
+        }
+
+        REQUIRE(result == 75);
+        REQUIRE(player->GetCardVals() == std::vector<int>{1, 3, 4, 5, 6, 7, 8, 9, 10, 11});
+        REQUIRE(GetDiscardCardCount() == 1);
+        REQUIRE(GetTopCardFromDiscard()->getValue() == 2);
+        ResetPlayers();
+    }
+}
+
+TEST_CASE_METHOD(TestRacko, "PlayTurn processes players in order and scores a completed round",
+                 "[Racko][PlayTurn]") {
+    auto* firstPlayer = new TestPlayer("First");
+    firstPlayer->SetCards(std::vector<int>{2, 4, 6, 8, 10, 12, 14, 16, 18, 20});
+    auto* winningPlayer = new TestPlayer("Winner");
+    winningPlayer->SetCards(std::vector<int>{3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+    auto* unplayedPlayer = new TestPlayer("Unplayed");
+    unplayedPlayer->SetCards(std::vector<int>{10, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+    AddPlayer(firstPlayer);
+    AddPlayer(winningPlayer);
+    AddPlayer(unplayedPlayer);
+    deck = std::make_unique<Deck>(2, 1);
+
+    std::istringstream input("0\n30\n0\n5\n");
+    std::ostringstream output;
+    {
+        ScopedStreamRedirect redirect(input, output);
+        PlayTurn();
+    }
+
+    REQUIRE(GetNumTurns() == 1);
+    REQUIRE(firstPlayer->GetCardVals() == std::vector<int>{2, 4, 6, 8, 10, 1, 14, 16, 18, 20});
+    REQUIRE(winningPlayer->GetCardVals() == std::vector<int>{2, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+    REQUIRE(unplayedPlayer->GetCardVals() == std::vector<int>{10, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+    REQUIRE(firstPlayer->GetScore() == 25);
+    REQUIRE(winningPlayer->GetScore() == 75);
+    REQUIRE(unplayedPlayer->GetScore() == 5);
+    REQUIRE(GetDiscardCardCount() == 2);
+    REQUIRE(GetDeckCardCount() == 0);
+    ResetPlayers();
+}
+
+TEST_CASE_METHOD(TestRacko, "FinishGame reports rankings and handles play-again input",
+                 "[Racko][FinishGame]") {
+    SECTION("Zero players can quit without printing nonexistent places") {
+        std::istringstream input("N\n");
+        std::ostringstream output;
+        int result = -1;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = FinishGame();
+        }
+
+        REQUIRE(result == 0);
+        REQUIRE(output.str().find("First Place: \n") != std::string::npos);
+        REQUIRE(output.str().find("Second Place:") == std::string::npos);
+    }
+
+    SECTION("One player can choose to play again after an invalid response") {
+        auto* solo = new TestPlayer("Solo");
+        solo->AddScore(20);
+        AddPlayer(solo);
+
+        std::istringstream input("x\nY\n");
+        std::ostringstream output;
+        int result = 0;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = FinishGame();
+        }
+
+        REQUIRE(result == 1);
+        REQUIRE(output.str().find("First Place: Solo\n") != std::string::npos);
+        REQUIRE(output.str().find("Second Place:") == std::string::npos);
+        ResetPlayers();
+    }
+
+    SECTION("Two players are reported in score order") {
+        auto* lower = new TestPlayer("Lower");
+        lower->AddScore(40);
+        auto* higher = new TestPlayer("Higher");
+        higher->AddScore(80);
+        AddPlayer(lower);
+        AddPlayer(higher);
+
+        std::istringstream input("n\n");
+        std::ostringstream output;
+        int result = -1;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = FinishGame();
+        }
+
+        REQUIRE(result == 0);
+        REQUIRE(output.str().find("First Place: Higher\n") != std::string::npos);
+        REQUIRE(output.str().find("Second Place: Lower\n") != std::string::npos);
+        ResetPlayers();
+    }
+
+    SECTION("Three players are reported in score order") {
+        auto* first = new TestPlayer("First");
+        first->AddScore(90);
+        auto* second = new TestPlayer("Second");
+        second->AddScore(60);
+        auto* third = new TestPlayer("Third");
+        third->AddScore(30);
+        AddPlayer(first);
+        AddPlayer(second);
+        AddPlayer(third);
+
+        std::istringstream input("n\n");
+        std::ostringstream output;
+        int result = -1;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = FinishGame();
+        }
+
+        REQUIRE(result == 0);
+        CHECK(output.str().find("First Place: First\n") != std::string::npos);
+        CHECK(output.str().find("Second Place: Second\n") != std::string::npos);
+        CHECK(output.str().find("Third Place: Third\n") != std::string::npos);
+        ResetPlayers();
+    }
+
+    SECTION("More than three players include the last-place player") {
+        auto* first = new TestPlayer("First");
+        first->AddScore(90);
+        auto* second = new TestPlayer("Second");
+        second->AddScore(70);
+        auto* third = new TestPlayer("Third");
+        third->AddScore(50);
+        auto* last = new TestPlayer("Last");
+        last->AddScore(10);
+        AddPlayer(first);
+        AddPlayer(second);
+        AddPlayer(third);
+        AddPlayer(last);
+
+        std::istringstream input("n\n");
+        std::ostringstream output;
+        int result = -1;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = FinishGame();
+        }
+
+        REQUIRE(result == 0);
+        CHECK(output.str().find("First Place: First\n") != std::string::npos);
+        CHECK(output.str().find("Second Place: Second\n") != std::string::npos);
+        CHECK(output.str().find("Third Place: Third\n") != std::string::npos);
+        CHECK(output.str().find("Last Place: Last\n") != std::string::npos);
+        ResetPlayers();
+    }
 }
