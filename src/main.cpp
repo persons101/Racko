@@ -1,15 +1,12 @@
 #include <iostream>
 
-#include "rackoDeck.h"
-#include "player.h"
+#include "racko.h"
 
 int main() {
-    RackoDeck deck;
-    Player player1("Steve");
+    Racko game;
 
-    while (player1.DrawCard(deck.GetTopCard()));
-
-    player1.PrintCards();
+    
+    game.Run();
 
     
 

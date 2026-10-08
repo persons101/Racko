@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <string>
 
 Card::Card(int newValue, Suit newSuit){
     this->value = newValue;
@@ -10,6 +11,11 @@ Card::Card(int newValue, Suit newSuit){
 
 Card::Card(std::tuple<int, Suit> vals) {
     *this = Card(std::get<0>(vals), std::get<1>(vals));
+}
+
+Card *Card::getCopy() const
+{
+    return new Card(*this);
 }
 
 int Card::getValue() const {
@@ -35,7 +41,7 @@ char Card::getValueChar() const {
 
 std::string Card::getValueString() const {
     switch (value) {
-        case 0: return "X";
+        case 0: return "Joker";
         case 1: return "A";
         case 10: return "T";
         case 11: return "J";
@@ -64,12 +70,12 @@ std::string Card::getSuitSymbol() const {
     }
 }
 
-void Card::PrintCard() const {
-    std::cout << "Card Value: " << value << ", Suit: " << suit_name(suit) << std::endl;
+std::string Card::PrintCard() const {
+    return "Card Value: " + std::to_string( value ) + ", Suit: " + suit_name(suit);
 }
 
-void Card::PrintCardShort() const {
-    std::cout << this->getValueString() << this->getSuitSymbol() << " ";
+std::string Card::PrintCardShort() const {
+    return this->getValueString() + this->getSuitSymbol();
 }
 
 const std::string Card::suit_name(Suit suit)  {
@@ -127,3 +133,9 @@ bool Card::compareCards::operator() (const Card* a, const std::tuple<int,Suit> b
         return a->value < std::get<0>(b);
     return (int)a->suit < (int)(std::get<1>(b));
 };
+
+std::ostream &operator<<(std::ostream& os, const Card & card)
+{
+    os << card.PrintCardShort();
+    return os;
+}

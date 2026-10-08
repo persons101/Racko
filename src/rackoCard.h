@@ -6,10 +6,13 @@
 class RackoCard : public Card {
 public:
     RackoCard(int cardVal);
-    RackoCard(Card card);
+    RackoCard(const Card& card);
+    ~RackoCard() = default;
+    virtual Card* getCopy() const override;
     virtual std::string getSuitSymbol() const override;
-    virtual void PrintCard() const override;
-    virtual void PrintCardShort() const override;
+    virtual std::string PrintCard() const override;
+    virtual std::string PrintCardShort() const override;
+    friend std::ostream& operator<<(std::ostream& os, const RackoCard&);
 };
 
 #endif

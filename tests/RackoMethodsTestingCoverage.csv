@@ -1,0 +1,151 @@
+Class,Method,ReturnType,ReturnConst,IsVirtual,Param1Type,Param1Name,Param1Const,Param2Type,Param2Name,Param2Const,Param3Type,Param3Name,Param3Const,Param4Type,Param4Name,Param4Const,Param5Type,Param5Name,Param5Const,Priority,Status,TestFile,TestName,Notes,
+Card,suit_name,std::string,false,false,Suit,,"false",,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Testing Suit to string","Explicit suit-name checks"
+Card,getValue,int,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/card.h","-","No direct assertion"
+Card,getSuit,Suit,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/card.h","-","No direct assertion"
+Card,getValueString,std::string,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/card.h","-","No direct assertion"
+Card,getSuitName,std::string,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/card.h","-","No direct assertion"
+Card,getSuitSymbol,std::string,false,true,,,,,,,,,,,,,,,,Medium,Covered,"src/card.h","RackoCard vs Card","Only verified through RackoCard output"
+Card,isBlack,bool,false,true,,,,,,,,,,,,,,,,Low,Covered,"src/card.h","-","No direct assertion"
+Card,PrintCard,std::string,false,true,,,,,,,,,,,,,,,,Low,Covered,"src/card.h","-","No direct assertion"
+Card,PrintCardShort,std::string,false,true,,,,,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","RackoCard vs Card","Output captured for RackoCard only"
+Card,operator==,bool,false,true,const Card&,rhs,true,,,,,,,,,,,,,Medium,Covered,"src/card.h","-","No equality tests"
+Card,operator!=,bool,false,true,const Card&,rhs,true,,,,,,,,,,,,,Medium,Covered,"src/card.h","-","No inequality tests"
+Card,compareCards,,,false,,,,,,,,,,,,,,,,Medium,Covered,"src/card.h","-","No comparator behavior test"
+Deck,Deck,void,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player drawing from deck","Constructors used in tests"
+Deck,GetNumCards,int,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player drawing from deck","Explicit checks"
+Deck,PopTopCard,Card*,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player drawing from deck","Explicit checks"
+Deck,PopBottomCard,Card*,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/deck.h","-","No direct test"
+Deck,GetTopCard,Card*,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/deck.h","-","No direct test"
+Deck,GetBottomCard,Card*,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/deck.h","-","No direct test"
+Deck,GetCards,std::vector<Card*>,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/deck.h","-","No direct assertion"
+Deck,Shuffle,void,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/deck.h","-","No direct assertion"
+Deck,PrintDeck,void,false,true,,,,,,,,,,,,,,,,Low,Covered,"src/deck.h","-","No direct assertion"
+Deck,MakeNewCard,Card*,false,true,int,value,true,Suit,suit,true,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Trying RackoDeck","Directly verify value and suit, including boundary values, and confirm a distinct allocated Card is returned"
+Deck,AddCardsToDeck,void,false,true,int,count,true,int,limit,true,,,,,,,,,,Low,Covered,"src/deck.h","-","No direct test"
+Deck,AddJokersToDeck,void,false,true,int,count,true,,,,,,,,,,,,,Low,Covered,"src/deck.h","-","No direct test"
+RackoDeck,RackoDeck,void,false,false,int,numCardsPerSuit,true,int,numSuits,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Trying RackoDeck","Constructor and deck size checked"
+RackoDeck,MakeNewCard,Card*,false,true,int,value,true,Suit,suit,true,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Trying RackoDeck","Verify RackoCard type and value for normal, lowest, and highest deck values; confirm the returned pointer is non-null"
+RackoDeck,PrintDeck,std::string,false,true,,,,,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","RackoDeck prints its full Racko card range","Capture output and require the start/end markers plus representative racko-card values"
+Player,Player,void,false,false,std::string,inName,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player class creation","Used across tests"
+Player,GetName,std::string,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player stores named and empty names","Construct named and empty-name players and require the exact stored names"
+Player,GetScore,int,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player class creation","Explicit checks"
+Player,AddScore,int,false,false,int,points,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player class creation","Explicit checks"
+Player,GetCards,std::vector<Card*>,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player class creation","Explicit checks"
+Player,DrawCard,bool,false,false,Card*,drawCard,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player class creation","Explicit checks"
+Player,DiscardCard,Card*,false,false,int,discardVal,true,Suit,discardSuit,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Player class creation","Explicit checks"
+Player,DiscardRandomCard,Card*,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player class creation","Explicit checks"
+Player,ResetPlayer,std::vector<Card*>,false,false,bool,returnToDeck,true,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player reset and ordered value access","Verified non-empty reset, returned-card ownership, zeroed score, and empty hand state"
+Player,GetCardVals,std::vector<int>,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player reset and ordered value access","Verified insertion-order values across a multi-card hand"
+Player,PrintCards,std::string,false,false,,,,,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","Player reset and ordered value access","Verified exact empty-hand and populated formatting strings"
+Player,GetNumCards,int,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player reset and ordered value access","Verified zero and post-draw/reset counts"
+RackoPlayer,RackoPlayer,void,false,false,std::string,newName,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","RackoPlayer construction and center formatting","Verify supplied and empty names, zero inherited score, and TestPlayer's 15-card fixture initialization",
+RackoPlayer,center,std::string,false,true,const std::string&,text,true,int,width,true,char,padding,true,,,,,,,High,Covered,"tests/tests.cpp","RackoPlayer centers text numbers","Verify 2-, 3-, and 4-character strings within width 4, including odd left/right padding and exact-width input; companion test checks custom padding and over-width text",
+RackoPlayer,DisplayCardsInRack,std::string,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","RackoPlayer displays rack values and positions","Check empty and populated racks for two-line output, four-character slots, card values, and position labels",
+RackoPlayer,IsCompletedWithRack,bool,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","RackoPlayer completion checks rack ordering","Require true for one-card and strictly increasing racks, and false for equal or descending adjacent values; empty rack is not asserted because implementation is unsafe",
+RackoPlayer,SelectCardToReplace,int,false,true,const Card*,cardToReplace,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","RackoPlayer selects a replacement card after invalid input","Capture output and feed invalid, zero, oversized, and valid card labels while restoring input/output streams",
+RackoPlayer,ReplaceCard,Card*,false,false,Card*,newCard,true,int,pos,true,,,,,,,,,,High,Covered,"tests/tests.cpp","RackoPlayer replaces cards at valid and invalid positions","Verify valid first/last replacement returns the old card and rejects null, negative, and equal-to-size positions without changing the rack",
+RackoPlayer,DiscardCard,Card*,false,false,int,cardPos,true,Suit,suit,true,,,,,,,,,,High,Covered,"tests/tests.cpp","RackoPlayer discards valid and invalid positions","Verify first/last valid positions return and remove cards, while negative and out-of-range positions return null and preserve count",
+Racko,Racko,void,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Game class creation","Constructor used"
+Racko,GetNumTurns,int,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko game initialization","Explicit checks"
+Racko,GetPlayerCount,int,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko game initialization","Explicit checks"
+Racko,GetDeckCardCount,int,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko game initialization","Explicit checks"
+Racko,GetDiscardCardCount,int,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko game initialization","Explicit checks"
+Racko,GetTopCardFromDeck,Card*,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko exposes valid deck, discard, and player lookup values","Verified a non-null top card is returned from a fresh deck"
+Racko,GetTopCardFromDiscard,Card*,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko exposes valid deck, discard, and player lookup values","Verified empty and populated discard pile handling"
+Racko,GetPlayerCardsByIdx,std::vector<Card*>,false,false,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko exposes valid deck, discard, and player lookup values","Verified valid player index returns the expected card list"
+Racko,GetPlayerCardsByName,std::vector<Card*>,false,false,std::string,playerName,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko exposes valid deck, discard, and player lookup values","Verified lookup by valid name returns the matching player cards"
+Racko,GetPlayerByIdx,Player*,false,false,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko exposes valid deck, discard, and player lookup values","Verified valid and invalid index behavior"
+Racko,GetPlayerByName,Player*,false,false,std::string,playerName,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko exposes valid deck, discard, and player lookup values","Verified valid and missing-name lookups"
+Racko,AddPlayer,void,false,false,std::string,playerName,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko game score calculation","Explicit checks"
+Racko,AddPlayer,void,false,false,Player*,newPlayer,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko game score calculation","Explicit checks"
+Racko,CalculateRackScore,int,false,true,const std::vector<Card*>&,cards,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","TestPlayer functions","Score checks present"
+Racko,SelectDrawCard,char,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Partial,"tests/tests.cpp","SelectDrawCard returns error for invalid player","Add direct Player* overload coverage plus null player, empty discard, deck choice, discard choice, invalid text, multi-character text, and EOF-safe stream cases"
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard accepts a Player pointer","Feed valid and invalid choices for a non-null player, test empty and populated discard piles, null player, and restore redirected streams"
+Racko,DrawCardForPlayer,int,false,false,int,playerIdx,true,bool,isDiscardPileChosen,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko draws cards from the deck and discard pile","Test invalid player, deck draw, discard draw, empty source, card-count updates, and return codes for each path"
+Racko,DrawCardForPlayer,int,false,false,Player*,player,true,bool,isDiscardPileChosen,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko draws cards from the deck and discard pile","Test null and non-null Player* overload behavior for both source choices, verifying ownership and hand updates"
+Racko,GetPlayerIdxByName,int,false,false,std::string,playerName,true,,,,,,,,,,,,,High,Partial,"src/racko.h","-","Check first, later, duplicate, empty, and unknown names with documented index behavior"
+Racko,PlayTurnForPlayerByIdx,int,false,false,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","One player turn","Add invalid index, non-Racko player, deck/discard choices, draw failure, incomplete rack, and completed-rack result cases"
+Racko,PlayTurnForPlayerByName,int,false,false,std::string,playerName,true,,,,,,,,,,,,,High,Covered,"src/racko.h","-","Check existing, unknown, empty, and duplicate names and verify delegated return behavior"
+Racko,ResetPlayers,void,false,false,,,,,,,,,,,,,,,,Medium,Covered,"src/racko.h","-","Reset populated and empty player collections, then require zero count and no stale player access"
+Racko,ScoreRackByIdx,void,false,false,int,playerIdx,true,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Racko scores valid player hands by index and name","Verified exact score updates for the first player via index"
+Racko,ScoreRackByName,void,false,false,std::string,playerName,true,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Racko scores valid player hands by index and name","Verified exact score updates for the matching player via name"
+Racko,SetupGame,void,false,true,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Racko setup initializes players and difficulty","Provide deterministic input or a fixture, then verify deck, discard pile, player setup, and score-goal state"
+Racko,PlayTurn,void,false,true,,,,,,,,,,,,,,,,High,Covered,"src/racko.h","-","Use a deterministic multi-player fixture and verify turn progression, draw/replacement flow, round completion, and termination"
+Racko,FinishGame,int,false,true,,,,,,,,,,,,,,,,High,Covered,"src/racko.h","-","Test zero, one, and multiple players with deterministic scores, requiring return value and winner output without null dereferences"
+Racko,ResetGame,void,false,true,,,,,,,,,,,,,,,,Medium,Covered,"src/racko.h","-","Reset a populated game and an already empty game, then verify counters, players, deck, discard pile, and turn state"
+Racko,SetScoreGoal,void,false,true,int,goal,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko difficulty and score goal settings","Verify zero, positive, and negative direct goals are stored exactly"
+Racko,SetScoreGoal,void,false,true,Difficulty,difficulty,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko difficulty and score goal settings","Verify Easy=100, Medium=150, Hard=200, and Custom uses the configured goal"
+Racko,SetDifficulty,void,false,true,Difficulty,difficulty,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko difficulty and score goal settings","Verify Easy and Custom difficulty state transitions"
+Racko,SetCustomGoal,void,false,true,int,goal,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko difficulty and score goal settings","Verify the minimum custom goal and a normal custom goal are retained"
+Racko,ChooseDifficulty,void,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko difficulty selection handles invalid input","Feed invalid, zero, and valid difficulty input and verify recovery and resulting goal"
+TestPlayer,GetTestCardVals,std::set<int>,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/src/testPlayer.h","TestPlayer functions","Used to build custom deck"
+TestDeck,TestDeck,void,false,false,,,,,,,,,,,,,,,,Medium,Partial,"tests/src/testDeck.h","One player turn","Used in turn behavior tests" 
+Card,getValue,int,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card methods","Checks the values of constructed cards",
+Card,getSuit,Suit,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card methods","Checks suits of constructed cards",
+Card,getValueChar,char,false,true,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card methods","Checks character formatting for card values",
+Card,getSuitName,std::string,false,true,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card methods","Checks suit names",
+Card,getSuitSymbol,std::string,false,true,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card methods","Checks suit symbols",
+Card,getValue,int,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks joker and ace values",
+Card,getSuit,Suit,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks card suits",
+Card,getValueString,std::string,false,true,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks joker and invalid value strings",
+Card,getSuitName,std::string,false,true,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks formatted suit names",
+Card,getSuitSymbol,std::string,false,true,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks formatted suit symbols",
+Card,isBlack,bool,false,true,,,,,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks red and black suit classification",
+Card,PrintCard,std::string,false,true,,,,,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks full card formatting",
+Card,PrintCardShort,std::string,false,true,,,,,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks short card formatting",
+Card,operator==,bool,false,true,const Card&,rhs,true,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks equal and unequal cards",
+Card,operator!=,bool,false,true,const Card&,rhs,true,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks equal and unequal cards",
+Card,compareCards,,,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Card accessors, formatting, and comparisons","Checks card ordering and tuple comparisons",
+Deck,Deck,void,false,false,int,numCardsPerSuit,true,int,numSuits,true,int,numJokers,true,,,,,,,High,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Constructs a deck with jokers and an empty deck",
+Deck,GetNumCards,int,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks card counts before and after pops",
+Deck,GetCards,std::vector<Card*>,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks deck contents before and after shuffle",
+Deck,GetTopCard,Card*,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks top card and empty deck behavior",
+Deck,GetBottomCard,Card*,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks bottom card and empty deck behavior",
+Deck,PopTopCard,Card*,false,false,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks top card removal and empty deck behavior",
+Deck,PopBottomCard,Card*,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks bottom card removal and empty deck behavior",
+Deck,Shuffle,void,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks deck size and contents remain valid after shuffle",
+Deck,PrintDeck,std::string,false,true,,,,,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Checks deck output markers",
+Deck,AddCardsToDeck,void,false,true,int,numCardsPerSuit,true,int,numSuits,true,,,,,,,,,,Low,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Exercised by deck construction",
+Deck,AddJokersToDeck,void,false,true,int,numJokers,true,,,,,,,,,,,,Low,Covered,"tests/tests.cpp","Deck accessors, boundaries, shuffle, and output","Exercised by deck construction",
+Racko,SelectDrawCard,char,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard chooses the deck","Accepts the deck choice",
+Racko,SelectDrawCard,char,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard chooses the discard pile","Accepts the discard choice",
+Racko,SelectDrawCard,char,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard rejects invalid input before deck choice","Recovers from invalid input and accepts the deck choice",
+Racko,SelectDrawCard,char,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard rejects discard choice when pile is empty","Rejects an empty discard choice and accepts the deck choice",
+Racko,SelectDrawCard,char,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard accepts discard choice when pile is not empty","Accepts a discard choice when a card is available",
+Racko,SelectDrawCard,char,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard rejects multi-character choices","Rejects multi-character input and accepts the deck choice",
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard returns error for invalid player","Exercises the null-player guard through the indexed overload",
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard chooses the deck","Exercises the player overload through the indexed overload",
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard chooses the discard pile","Exercises the player overload through the indexed overload",
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard rejects invalid input before deck choice","Exercises the player overload through the indexed overload",
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard rejects discard choice when pile is empty","Exercises the player overload through the indexed overload",
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard accepts discard choice when pile is not empty","Exercises the player overload through the indexed overload",
+Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard rejects multi-character choices","Exercises the player overload through the indexed overload",
+Racko,CreatePlayer,Player*,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko creates a player from a name","Checks the created player's name",
+Racko,CreatePlayer,Player*,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko CreatePlayer handles whitespace and end of input","Checks whitespace-prefixed names return a RackoPlayer and EOF returns nullptr",
+Player,GetName,std::string,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Racko creates a player from a name","Checks the name of the created player",
+Player,GetNumCards,int,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Checks card count after reset and each hand mutation",
+Player,GetCards,std::vector<Card*>,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Compares stored card count with hand size",
+Player,DrawCard,bool,false,false,Card*,drawCard,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Checks card count after drawing cards",
+Player,ResetPlayer,std::vector<Card*>,false,false,bool,returnToDeck,true,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Checks count after resetting the hand",
+RackoPlayer,ReplaceCard,Card*,false,false,Card*,newCard,true,int,pos,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Checks count and values after replacement",
+RackoPlayer,DiscardCard,Card*,false,false,int,cardPos,true,Suit,suit,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Checks count after discarding a selected card",
+Player,DiscardRandomCard,Card*,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Checks count after random discard",
+Racko,DrawCardForPlayer,int,false,false,int,playerIdx,true,bool,isDiscardPileChosen,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko draws cards from the deck and discard pile","Covers invalid index and successful indexed deck draw",
+Racko,DrawCardForPlayer,int,false,false,Player*,player,true,bool,isDiscardPileChosen,true,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko draws cards from the deck and discard pile","Covers null player, deck draw, discard draw, and empty discard pile",
+Racko,GetPlayerIdxByName,int,false,false,std::string,playerName,true,,,,,,,,,,,,,High,Partial,"tests/tests.cpp","Racko finds player indexes by name","Covers first, later, duplicate, and empty names; unknown-name behavior is not asserted",
+Racko,ResetPlayers,void,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Racko resets the player collection","Clears a populated player collection and safely resets an empty collection",
+Racko,PlayTurnForPlayerByName,int,false,true,std::string,playerName,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko reports an empty deck during a named player turn","Covers delegation and the empty-deck error path for a valid player name",
+Racko,ResetGame,void,false,true,bool,keepPlayers,true,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Racko resets game state and optionally keeps players","Resets turns, deck, and discard pile with and without retaining players",
+Racko,PlayTurn,void,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko resets game state and optionally keeps players","Covers turn counter advancement when there are no players",
+Racko,PlayTurnForPlayerByIdx,int,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","PlayTurnForPlayerByIdx replaces a card and reports rack completion","Checks discard placement and the non-winning and completed-rack return values",
+Racko,PlayTurn,void,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","PlayTurn processes players in order and scores a completed round","Checks that later players are skipped after completion and every player's rack is scored",
+Racko,FinishGame,int,false,true,,,,,,,,,,,,,,,,High,Partial,"tests/tests.cpp","FinishGame reports rankings and handles play-again input","Checks player counts from zero through more than three; ranking assertions for three or more expose current ordering gaps; tests invalid and valid responses",
+Deck,MakeNewCard,Card*,false,true,int,cardValue,true,Suit,cardSuit,true,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Deck card factory creates distinct cards with the requested values","Verify independent cards and requested value/suit for a regular card and joker",
+RackoDeck,MakeNewCard,Card*,false,true,int,cardVal,true,Suit,cardSuit,true,,,,,,,,,,Medium,Covered,"tests/tests.cpp","RackoDeck card factory returns RackoCards at both value boundaries","Verify RackoCard type, value, and Racko suit for the lowest and highest deck values",
+Racko,PlacementForLarger,Player*,false,false,Player*&,currentlyPlacedPlayer,false,Player*,otherPlayer,false,bool,arrDescending,false,,,,,,,High,Covered,"tests/tests.cpp","PlacementForLarger maintains highest and lowest placements","Verify null placement, retained and displaced candidates, and both descending modes",
+RackoPlayer,operator<,bool,false,false,const RackoPlayer&,other,true,,,,,,,,,,,,,Medium,Partial,"tests/tests.cpp","RackoPlayer orders players by score and then name","Check score ordering, alphabetical tie-breaking, reverse comparisons, and self-comparison",
+TestPlayer,GetTestCardVals,std::vector<int>,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","TestPlayer provides its documented fixture cards","Verify all 15 fixture values and uniqueness",
+TestDeck,TestDeck,void,false,false,const std::unordered_set<int>&,cardsToInclude,true,,,,,,,,,,,,,Medium,Partial,"tests/tests.cpp","TestDeck contains the selected Racko fixture cards","Verify selected card values and RackoCard type; the test also checks card count",
+Racko,GetPlayerIdxByName,int,false,false,std::string,playerName,true,,,,,,,,,,,,,High,Partial,"tests/tests.cpp","Racko player-name lookup handles duplicate and unknown names","Check duplicate and empty names plus unknown-name behavior",
+Racko,PlayTurnForPlayerByIdx,int,false,true,int,playerIdx,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","PlayTurnForPlayerByIdx handles invalid players and draw sources","Check null and non-Racko players, empty deck, discard draw, and out-of-range index",
+Racko,PlayTurnForPlayerByName,int,false,true,std::string,playerName,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","PlayTurnForPlayerByName resolves duplicate and empty names","Check duplicate and empty names and unknown-name exception behavior",

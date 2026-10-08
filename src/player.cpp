@@ -1,67 +1,138 @@
 #include "player.h"
 
-#include <random>
+#include <algorithm>
 #include <iostream>
+#include <random>
 
 Player::Player() { *this = Player("Test"); }
 
-Player::Player(std::string inName) : name(inName), score(0), numCards(0) {}
+Player::Player(std::string inName) : score(0), name(inName), numCards(0) {}
 
-std::string Player::GetName() const { return name; }
+std::string Player::GetName() const {
+    return name;
+}
 
-
-int Player::GetScore() const { return score; }
+int Player::GetScore() const {
+    return score;
+}
 
 int Player::AddScore(int points) {
     score += points;
     return points;
 }
 
+Player::~Player()
+{
+    for (auto card : myCards) {
+        delete card;
+    }
+}
 
-std::set<Card*, Card::compareCards> Player::GetCards() const {
+std::size_t Player::GetNumCards() const
+{
+    return numCards; 
+}
+
+std::vector<Card*> Player::ResetPlayer(bool returnToDeck)
+{
+    score = 0;
+    std::vector<Card*> cardsToDeck;
+    if (returnToDeck) {
+        for (std::size_t i = 0; i < myCards.size(); i++) {
+            cardsToDeck.push_back( myCards.at(i) );
+            myCards.at(i) = nullptr;
+        }
+    }
+    else {
+        for (auto card : myCards) {
+            delete card;
+        }
+    }
+    
+    myCards = {};
+    numCards = 0;
+
+    return cardsToDeck;
+}
+
+std::vector<Card *> Player::GetCards() const
+{
     return myCards;
 }
 
-void Player::PrintCards() const {
-    std::cout << name << "'s hand: ";
-
-    for (auto card : myCards){
-        card->PrintCardShort();
+std::vector<int> Player::GetCardVals() const
+{
+    std::vector<int> myCardVals;
+    Card* card = nullptr;
+    for (std::size_t i = 0; i < myCards.size(); i++) {
+        card = myCards.at(i);
+        myCardVals.push_back(card->getValue());
     }
-    std::cout << "\n";
+    return myCardVals;
 }
 
-bool Player::DrawCard(Card* drawCard){
-    if (drawCard == nullptr)
-        return false;
+std::string Player::PrintCards() const {
+    std::string returnVal = "";
+    returnVal += name + "'s hand: ";
 
-    myCards.insert(drawCard);
+    for (Card* card : myCards) {
+        returnVal += card->PrintCardShort() + " ";
+    }
+
+    return returnVal.substr(0, returnVal.size() - 1);
+}
+
+bool Player::DrawCard(Card* drawCard) {
+    if (drawCard == nullptr) {
+        return false;
+    }
+
+    myCards.push_back(drawCard);
     numCards++;
     return true;
 }
 
-// TODO add Player::DiscardCard(Card*)
+Card* Player::DiscardCard(int discardVal, Suit discardSuit) {
+    Card cardToDiscard(discardVal, discardSuit);
+    Card::compareCards comparator;
 
-Card* Player::DiscardCard(int discardVal, Suit discardSuit){
-    Card cardToDiscard(discardVal, discardSuit);                                         // this should prolly be changed
-    std::set<Card*>::const_iterator itCardBeingDiscarded = myCards.find(&cardToDiscard); // this might be weird with derived Card types
-    if (itCardBeingDiscarded == myCards.end())
+    auto it = std::find_if(
+        myCards.begin(),
+        myCards.end(),
+        [&](Card* card) {
+            return !comparator(card, &cardToDiscard) &&
+                   !comparator(&cardToDiscard, card);
+        });
+
+    if (it == myCards.end()) {
         return nullptr;
+    }
 
-    auto nh = myCards.extract(*itCardBeingDiscarded);
+    Card* discardedCard = *it;
+    myCards.erase(it);
     numCards--;
-    
-    return nh.value();
+
+    return discardedCard;
 }
 
 Card* Player::DiscardRandomCard() {
-    std::set<Card*>::iterator it = myCards.begin();
-    for (int i = 0; i < (rand() % myCards.size()); i++){
-        it++;
+    if (myCards.empty()) {
+        return nullptr;
     }
 
-    auto nh = myCards.extract(it);
+    static std::random_device randomDevice;
+    static std::mt19937 generator(randomDevice());
+
+    std::uniform_int_distribution<std::size_t> distribution(
+        0,
+        myCards.size() - 1
+    );
+
+    auto it = myCards.begin() + distribution(generator);
+    Card* discardedCard = *it;
+
+    myCards.erase(it);
     numCards--;
-    
-    return nh.value();
+
+    return discardedCard;
 }

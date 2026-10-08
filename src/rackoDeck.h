@@ -9,7 +9,8 @@ protected:
     virtual Card* MakeNewCard(int, Suit) override;
 public:
     RackoDeck();
-    virtual void PrintDeck() const override;
+    ~RackoDeck() = default;
+    virtual std::string PrintDeck() const override;
 };
 
 #endif
