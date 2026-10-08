@@ -41,9 +41,6 @@ void Racko::AddStartingCardsToPlayer(Player*& player)
 
 char Racko::SelectDrawCard(int playerIdx) const
 {
-    /// Shows the player at @param{playerIdx} the top of the draw and discard piles
-    /// @return D'r'aw pile, D'i'scard, or 'e'rror
-
     return SelectDrawCard(GetPlayerByIdx(playerIdx));
 }
 

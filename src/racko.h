@@ -50,6 +50,10 @@ protected:
     virtual int CalculateRackScore(const std::vector<Card*>&) const;
 
     virtual void AddStartingCardsToPlayer(Player*&);
+    
+    /// @brief Shows the options of card to choose from and lets the player choose.
+    /// @param playerIdx Index of the player within playerVector
+    /// @return D'r'aw pile, D'i'scard, or 'e'rror
     virtual char SelectDrawCard(int playerIdx) const;
     virtual char SelectDrawCard(Player*) const;
     virtual Card* PopCard(bool);
