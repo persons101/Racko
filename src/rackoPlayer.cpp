@@ -58,7 +58,7 @@ std::string RackoPlayer::PrintCards() const
     return bothLines;
 }
 
-bool RackoPlayer::IsCompletedWithRack()
+bool RackoPlayer::IsCompletedWithRack() const
 {
     for (int i = 0; i < myCards.size() - 1; i++) {
         if (!(myCards.at(i + 1)->getValue() > myCards.at(i)->getValue()))

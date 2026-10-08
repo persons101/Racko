@@ -6,6 +6,7 @@ public:
     using Racko::ChooseDifficulty;
     using Racko::DrawCardForPlayer;
     using Racko::GetPlayerIdxByName;
+    using Racko::PlacementForLarger;
     using Racko::PlayTurnForPlayerByIdx;
     using Racko::PlayTurnForPlayerByName;
     using Racko::ResetPlayers;

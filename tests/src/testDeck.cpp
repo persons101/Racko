@@ -8,7 +8,7 @@
 #include "../../src/RackoCard.h"
 
 TestDeck::TestDeck() {
-    deck = {};
+    deck = {}; // acceptable because numCards starts and ends at 60
     for (int i = 11; i <= 15; i++) {
         Card* currCard = new RackoCard(i);
         deck.push_back(currCard);
@@ -32,14 +32,27 @@ TestDeck::TestDeck() {
 
 TestDeck::TestDeck(const std::unordered_set<int>& cardsToInclude)
 {
-    deck = {};
+    while (!deck.empty()) {
+        this->PopTopCard();
+    }
 
-    std::vector<int> shuffledCards(cardsToInclude.begin(), cardsToInclude.end());
+    std::vector<int> shuffledCards = std::vector<int>(cardsToInclude.begin(), cardsToInclude.end());
     std::random_device rd;
     std::mt19937 gen(rd());
     std::shuffle(shuffledCards.begin(), shuffledCards.end(), gen);
 
     for (int cardValue : shuffledCards) {
+        AddCardToDeck(new RackoCard(cardValue));
+    }
+}
+
+TestDeck::TestDeck(const std::vector<int> &cardsToInclude)
+{
+    while (!deck.empty()) {
+        this->PopTopCard();
+    }
+
+    for (int cardValue : cardsToInclude) {
         AddCardToDeck(new RackoCard(cardValue));
     }
 }

@@ -1193,3 +1193,251 @@ TEST_CASE_METHOD(TestRacko, "FinishGame reports rankings and handles play-again 
         ResetPlayers();
     }
 }
+
+TEST_CASE("Deck card factory creates distinct cards with the requested values",
+          "[Deck][MakeNewCard]") {
+    InspectableDeck deck(0, 0);
+
+    Card* ace = deck.MakeNewCard(1, Suit::SPADES);
+    Card* joker = deck.MakeNewCard(0, Suit::HEARTS);
+
+    REQUIRE(ace != nullptr);
+    REQUIRE(ace->getValue() == 1);
+    REQUIRE(ace->getSuit() == Suit::SPADES);
+    REQUIRE(joker != nullptr);
+    REQUIRE(joker->getValue() == 0);
+    REQUIRE(joker->getSuit() == Suit::HEARTS);
+    REQUIRE(ace != joker);
+
+    delete ace;
+    delete joker;
+}
+
+TEST_CASE("RackoDeck card factory returns RackoCards at both value boundaries",
+          "[RackoDeck][MakeNewCard]") {
+    InspectableRackoDeck deck;
+
+    Card* lowest = deck.MakeNewCard(1, Suit::SPADES);
+    Card* highest = deck.MakeNewCard(60, Suit::CLUBS);
+
+    REQUIRE(lowest != nullptr);
+    REQUIRE(dynamic_cast<RackoCard*>(lowest) != nullptr);
+    REQUIRE(lowest->getValue() == 1);
+    REQUIRE(lowest->getSuit() == static_cast<Suit>(0));
+    REQUIRE(highest != nullptr);
+    REQUIRE(dynamic_cast<RackoCard*>(highest) != nullptr);
+    REQUIRE(highest->getValue() == 60);
+    REQUIRE(highest->getSuit() == static_cast<Suit>(0));
+    REQUIRE(lowest != highest);
+
+    delete lowest;
+    delete highest;
+}
+
+TEST_CASE("TestPlayer provides its documented fixture cards",
+          "[TestPlayer][GetTestCardVals]") {
+    const std::vector<int> fixtureValues = TestPlayer::GetTestCardVals();
+    const std::set<int> fixtureValueSet(fixtureValues.begin(), fixtureValues.end());
+    const std::set<int> expectedValues{
+        1, 2, 3, 4, 5, 6, 10, 18, 20, 25, 30, 35, 36, 38, 40
+    };
+
+    REQUIRE(fixtureValues.size() == 15);
+    REQUIRE(fixtureValueSet == expectedValues);
+}
+
+TEST_CASE("TestDeck contains the selected Racko fixture cards",
+          "[TestDeck][TestDeck]") {
+    const std::unordered_set<int> selectedValues{3, 12, 58};
+    TestDeck deck(selectedValues);
+    const std::vector<Card*> cards = deck.GetCards();
+
+    REQUIRE(cards.size() == selectedValues.size());
+    std::set<int> deckValues;
+    for (const Card* card : cards) {
+        REQUIRE(dynamic_cast<const RackoCard*>(card) != nullptr);
+        deckValues.insert(card->getValue());
+    }
+    REQUIRE(deckValues == std::set<int>{3, 12, 58});
+    CHECK(deck.GetNumCards() == selectedValues.size());
+}
+
+TEST_CASE("TestDeck contains the selected and ordered Racko fixture cards",
+          "[TestDeck][TestDeck]") {
+    const std::vector<int> selectedValues{3, 58, 12};
+    TestDeck deck(selectedValues);
+    const std::vector<Card*> cards = deck.GetCards();    
+
+    REQUIRE(cards.size() == selectedValues.size());
+    std::vector<int> deckValuesVector;
+    for (const Card* card : cards) {
+        REQUIRE(dynamic_cast<const RackoCard*>(card) != nullptr);
+        deckValuesVector.push_back(card->getValue());
+    }
+    REQUIRE(deckValuesVector == std::vector<int>{3, 58, 12});
+    CHECK(deck.GetNumCards() == selectedValues.size());
+}
+
+TEST_CASE_METHOD(TestRacko, "PlacementForLarger maintains highest and lowest placements",
+                 "[Racko][PlacementForLarger]") {
+    Player first("First");
+    Player second("Second");
+    Player third("Third");
+    first.AddScore(100);
+    second.AddScore(60);
+    third.AddScore(20);
+
+    Player* placed = nullptr;
+    REQUIRE(PlacementForLarger(placed, &first, false) == nullptr);
+    REQUIRE(placed == &first);
+
+    Player* unplaced = PlacementForLarger(placed, &second, false);
+    REQUIRE(placed == &first);
+    REQUIRE(unplaced == &second);
+
+    unplaced = PlacementForLarger(placed, &third, false);
+    REQUIRE(placed == &first);
+    REQUIRE(unplaced == &third);
+
+    Player* candidate = nullptr;
+    REQUIRE(PlacementForLarger(candidate, &first, true) == nullptr);
+    REQUIRE(candidate == &first);
+
+    unplaced = PlacementForLarger(candidate, &third, true);
+    REQUIRE(candidate == &third);
+    REQUIRE(unplaced == &first);
+
+    unplaced = PlacementForLarger(candidate, &second, true);
+    REQUIRE(candidate == &third);
+    REQUIRE(unplaced == &second);
+
+    Player higher("Higher");
+    higher.AddScore(120);
+    unplaced = PlacementForLarger(placed, &higher, false);
+    REQUIRE(placed == &higher);
+    REQUIRE(unplaced == &first);
+}
+
+TEST_CASE("RackoPlayer orders players by score and then name",
+          "[RackoPlayer][operator<]") {
+    RackoPlayer lowerScore("Zulu");
+    RackoPlayer higherScore("Alpha");
+    lowerScore.AddScore(10);
+    higherScore.AddScore(20);
+
+    CHECK(lowerScore < higherScore);
+    CHECK_FALSE(higherScore < lowerScore);
+
+    RackoPlayer earlierName("Alex");
+    RackoPlayer laterName("Blair");
+    earlierName.AddScore(20);
+    laterName.AddScore(20);
+
+    CHECK(earlierName < laterName);
+    CHECK_FALSE(laterName < earlierName);
+    CHECK_FALSE(earlierName < earlierName);
+}
+
+TEST_CASE_METHOD(TestRacko, "Racko player-name lookup handles duplicate and unknown names",
+                 "[Racko][GetPlayerIdxByName]") {
+    AddPlayer("Alpha");
+    AddPlayer("Bravo");
+    AddPlayer("Alpha");
+    AddPlayer("");
+
+    REQUIRE(GetPlayerIdxByName("Alpha") == 0);
+    REQUIRE(GetPlayerIdxByName("Bravo") == 1);
+    REQUIRE(GetPlayerIdxByName("") == 3);
+    CHECK(GetPlayerIdxByName("Missing") == -1);
+    CHECK(GetPlayerByName("Missing") == nullptr);
+}
+
+TEST_CASE_METHOD(TestRacko, "PlayTurnForPlayerByIdx handles invalid players and draw sources",
+                 "[Racko][PlayTurnForPlayerByIdx]") {
+    SECTION("Null and non-Racko players return their documented errors") {
+        AddPlayer(static_cast<Player*>(nullptr));
+        REQUIRE(PlayTurnForPlayerByIdx(0) == -1);
+
+        ResetPlayers();
+        AddPlayer(new Player("Base"));
+        REQUIRE(PlayTurnForPlayerByIdx(0) == -2);
+        ResetPlayers();
+    }
+
+    SECTION("An empty deck reports a draw-selection error") {
+        auto* player = new TestPlayer("Empty");
+        player->SetCards(std::vector<int>{1, 3, 5});
+        AddPlayer(player);
+        deck = std::make_unique<Deck>(0, 0);
+
+        REQUIRE(PlayTurnForPlayerByIdx(0) == -3);
+        REQUIRE(player->GetCardVals() == std::vector<int>{1, 3, 5});
+        ResetPlayers();
+    }
+
+    SECTION("A discard-pile draw replaces the selected rack position") {
+        auto* player = new TestPlayer("Discard");
+        player->SetCards(std::vector<int>{2, 4, 6, 8, 10, 12, 14, 16, 18, 20});
+        AddPlayer(player);
+        deck = std::make_unique<Deck>(1, 1);
+        AddCardToDiscard(new RackoCard(50));
+
+        std::istringstream input("1\n30\n");
+        std::ostringstream output;
+        int result = -1;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = PlayTurnForPlayerByIdx(0);
+        }
+
+        REQUIRE(result == 0);
+        REQUIRE(player->GetCardVals() == std::vector<int>{2, 4, 6, 8, 10, 50, 14, 16, 18, 20});
+        REQUIRE(GetDiscardCardCount() == 1);
+        REQUIRE(GetTopCardFromDiscard()->getValue() == 12);
+        ResetPlayers();
+    }
+
+    SECTION("An out-of-range player index throws") {
+        REQUIRE_THROWS_AS(PlayTurnForPlayerByIdx(0), std::out_of_range);
+    }
+}
+
+TEST_CASE_METHOD(TestRacko, "PlayTurnForPlayerByName resolves duplicate and empty names",
+                 "[Racko][PlayTurnForPlayerByName]") {
+    SECTION("A duplicate name resolves to the first matching player") {
+        auto* first = new TestPlayer("Twin");
+        first->SetCards(std::vector<int>{2, 4, 6, 8, 10, 12, 14, 16, 18, 20});
+        auto* second = new TestPlayer("Twin");
+        second->SetCards(std::vector<int>{3, 5, 7, 9, 11, 13, 15, 17, 19, 21});
+        AddPlayer(first);
+        AddPlayer(second);
+        deck = std::make_unique<Deck>(1, 1);
+
+        std::istringstream input("0\n30\n");
+        std::ostringstream output;
+        int result = -1;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            result = PlayTurnForPlayerByName("Twin");
+        }
+
+        REQUIRE(result == 0);
+        REQUIRE(first->GetCardVals().at(5) == 1);
+        REQUIRE(second->GetCardVals() == std::vector<int>{3, 5, 7, 9, 11, 13, 15, 17, 19, 21});
+        ResetPlayers();
+    }
+
+    SECTION("An empty name resolves to the matching player") {
+        auto* player = new TestPlayer("");
+        player->SetCards(std::vector<int>{1, 3, 5});
+        AddPlayer(player);
+        deck = std::make_unique<Deck>(0, 0);
+
+        REQUIRE(PlayTurnForPlayerByName("") == -3);
+        ResetPlayers();
+    }
+
+    SECTION("An unknown name propagates the invalid-index exception") {
+        REQUIRE_THROWS_AS(PlayTurnForPlayerByName("Missing"), std::out_of_range);
+    }
+}

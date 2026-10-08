@@ -189,21 +189,15 @@ int Racko::AddCardToDiscard(Card * cardToAdd)
 
 int Racko::GetPlayerIdxByName(std::string playerName) const
 {
-    int idx = -1;
-
     Player* currPlayer = nullptr;
 
-    std::vector<Player*>::iterator it;
-
-    unsigned int i = 0;
-    for (/*i*/; i < playerCnt; i++) {
-        currPlayer = playerVector.at(i);
+    for (auto it = playerVector.begin(); it != playerVector.end(); it++) {
+        currPlayer = *it;
         if (currPlayer->GetName() == playerName)
-            break;
+            return it - playerVector.begin();
     }
 
-    idx = i;
-    return idx;
+    return -1;
 }
 
 int Racko::PlayTurnForPlayerByIdx(int playerIdx)
