@@ -32,6 +32,8 @@ int Racko::CalculateRackScore(const std::vector<Card *>& cards) const
 
 void Racko::AddStartingCardsToPlayer(Player*& player)
 {
+    if (player == nullptr)
+        return;
     for (int i = 0; i < 10; i++) {
         player->DrawCard( PopCard(false) );        
     }
@@ -60,7 +62,12 @@ char Racko::SelectDrawCard(Player * player) const
     
     // input validation
     while (input != "0" && input != "1") {
-        std::cin >> input;
+        while (!(std::cin >> input)) {
+            
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        
         if (input.size() > 1) {
             input = "-";
         }
@@ -415,6 +422,9 @@ std::vector<Card *> Racko::GetPlayerCardsByIdx(int playerIdx) const
 std::vector<Card *> Racko::GetPlayerCardsByName(std::string playerName) const
 {
     Player* player = GetPlayerByName(playerName);
+    if (player == nullptr) {
+        return std::vector<Card *>();
+    }
 
     return player->GetCards();
 }
@@ -470,7 +480,10 @@ void Racko::SetupGame()
     do {
         try {
             std::cout << "Enter number of players: ";
-            std::cin >> inputString;
+            if (!(std::cin >> inputString)){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
 
             numPlayersToAdd = std::stoi(inputString);
         }
@@ -487,9 +500,21 @@ void Racko::SetupGame()
     } while (numPlayersToAdd <= 0);
 
     for (int i = 0; i < numPlayersToAdd; i++) {
-        Player* player = CreatePlayer();
-        AddStartingCardsToPlayer(player);
-        AddPlayer(player);
+        Player* player = nullptr;
+        do {
+            try {
+                player = CreatePlayer();
+                if (player == nullptr) {
+                    throw std::invalid_argument("Invalid argument: Please input a valid string. ");
+                }
+                AddStartingCardsToPlayer(player);
+                AddPlayer(player);
+            }
+            catch (const std::invalid_argument& e) {
+                std::cerr << e.what() << "\n";
+                continue;
+            }
+        } while (nullptr == player);
     }
 
     ChooseDifficulty();
@@ -690,7 +715,13 @@ int Racko::FinishGame()
 
     std::cout << "\n\nWould you like to play again? (Y/N) ";
     while (playAgainChar != 'y' && playAgainChar != 'n') {
-        std::cin >> playAgainChar;
+        if (!(std::cin >> playAgainChar)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            playAgainChar = '-';
+        }
+
+        
         if (playAgainChar < 91) {
             playAgainChar += 32;
         }

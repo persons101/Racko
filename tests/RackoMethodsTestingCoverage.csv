@@ -121,6 +121,7 @@ Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covere
 Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard accepts discard choice when pile is not empty","Exercises the player overload through the indexed overload",
 Racko,SelectDrawCard,char,false,true,Player*,player,true,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","SelectDrawCard rejects multi-character choices","Exercises the player overload through the indexed overload",
 Racko,CreatePlayer,Player*,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko creates a player from a name","Checks the created player's name",
+Racko,CreatePlayer,Player*,false,true,,,,,,,,,,,,,,,,High,Covered,"tests/tests.cpp","Racko CreatePlayer handles whitespace and end of input","Checks whitespace-prefixed names return a RackoPlayer and EOF returns nullptr",
 Player,GetName,std::string,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Racko creates a player from a name","Checks the name of the created player",
 Player,GetNumCards,int,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Checks card count after reset and each hand mutation",
 Player,GetCards,std::vector<Card*>,false,false,,,,,,,,,,,,,,,,Medium,Covered,"tests/tests.cpp","Player keeps numCards synchronized","Compares stored card count with hand size",

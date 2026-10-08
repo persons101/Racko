@@ -270,6 +270,12 @@ TEST_CASE_METHOD(TestRacko, "Racko game score calculation", "[Racko][RackoCard][
         REQUIRE(GetPlayerByIdx(0)->GetCardVals() == std::vector({11,5,10,18,20,25,30,35,36,38,40,2,3,4,6 }));
     }
 
+    delete card1;
+    delete card2;
+    delete card3;
+    delete card4;
+    delete card5;
+    delete card6;
 }
 
 
@@ -767,6 +773,36 @@ TEST_CASE_METHOD(TestRacko, "Racko creates a player from a name", "[Racko][Creat
     REQUIRE(player->GetName() == name);
 
     
+}
+
+TEST_CASE_METHOD(TestRacko, "Racko CreatePlayer handles whitespace and end of input",
+                 "[Racko][CreatePlayer]") {
+    SECTION("Leading whitespace is skipped before reading the name") {
+        std::istringstream input(" \t\n  Kathy\n");
+        std::ostringstream output;
+        Player* createdPlayer = nullptr;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            createdPlayer = CreatePlayer();
+        }
+
+        std::unique_ptr<Player> playerOwner(createdPlayer);
+        REQUIRE(playerOwner != nullptr);
+        REQUIRE(playerOwner->GetName() == "Kathy");
+        REQUIRE(dynamic_cast<RackoPlayer*>(playerOwner.get()) != nullptr);
+    }
+
+    SECTION("End of input returns nullptr") {
+        std::istringstream input;
+        std::ostringstream output;
+        Player* player = nullptr;
+        {
+            ScopedStreamRedirect redirect(input, output);
+            player = CreatePlayer();
+        }
+
+        REQUIRE(player == nullptr);
+    }
 }
 
 TEST_CASE("Player keeps numCards synchronized", "[Player][numCards][GetNumCards]") {
