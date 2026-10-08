@@ -1,4 +1,4 @@
-# C++/C# game replicating the Milton-Bradley game Racko.
+# C++/C# game replicating the Milton-Bradley game Racko
 
 ## Single-file coverage report
 
